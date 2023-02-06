@@ -12,7 +12,7 @@ import { toast } from "react-hot-toast";
 import { Web3Auth } from "@web3auth/modal";
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
-import RPC from "../Polygon/RPC";
+import RPC from "./_RPC";
 
 // Solana
 import {
