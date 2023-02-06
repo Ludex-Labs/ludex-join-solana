@@ -1,4 +1,4 @@
-![Alt text](/public/assets/solana.svg)
+<center>![Solana](/public/assets/solana.svg)</center>
 
 # Getting Started with Ludex Join on Solana
 
