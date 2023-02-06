@@ -1,4 +1,6 @@
-<center>![Solana](/public/assets/solana.svg)</center>
+<p align="center">
+  <img width="460" height="300" src="/public/assets/solana.svg">
+</p>
 
 # Getting Started with Ludex Join on Solana
 
