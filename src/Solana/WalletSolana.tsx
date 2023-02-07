@@ -1,16 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { FC, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { RPC, getTestSol, viewTokenAccounts, importToken } from "./RPC";
-import { Connection } from "@solana/web3.js";
 import { NFTMint } from "./NFTMint";
+import { Connection } from "@solana/web3.js";
 import { SafeEventEmitterProvider } from "@web3auth/base";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import SendIcon from "@mui/icons-material/Send";
-import NotesIcon from "@mui/icons-material/Notes";
-import UploadIcon from "@mui/icons-material/Upload";
-import CloseIcon from "@mui/icons-material/Close";
+import { RPC, getTestSol, viewTokenAccounts, importToken } from "./RPC";
+
+// MUI
 import {
   Box,
   IconButton,
@@ -19,14 +16,17 @@ import {
   InputLabel,
   OutlinedInput,
   InputAdornment,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   Typography,
   Dialog,
   DialogTitle,
+  MenuItem,
+  Select,
 } from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import SendIcon from "@mui/icons-material/Send";
+import NotesIcon from "@mui/icons-material/Notes";
+import UploadIcon from "@mui/icons-material/Upload";
+import CloseIcon from "@mui/icons-material/Close";
 
 export const WalletSolana: FC<{
   provider: SafeEventEmitterProvider | null;
@@ -68,7 +68,7 @@ export const WalletSolana: FC<{
   };
 
   return (
-    <Box>
+    <>
       <Typography variant={"h5"} sx={{ mb: 2 }}>
         Your Wallet
       </Typography>
@@ -122,42 +122,20 @@ export const WalletSolana: FC<{
         />
       </FormControl>
 
-      <FormControl
-        sx={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          mb: 2,
-        }}
-      >
-        <FormLabel>Network</FormLabel>
-        <RadioGroup
-          defaultValue="devnet"
-          value={isMainnet}
-          sx={{ ml: 2, display: "flex", flexDirection: "row" }}
+      <FormControl fullWidth sx={{ mb: 3 }}>
+        <InputLabel>Network</InputLabel>
+        <Select
+          value={isMainnet ? "mainnet" : "devnet"}
+          label="Network"
+          onChange={(e) =>
+            e.target.value === "mainnet"
+              ? changeNetwork("mainnet")
+              : changeNetwork("devnet")
+          }
         >
-          <FormControlLabel
-            value={false}
-            control={<Radio />}
-            label="Devnet"
-            onClick={() => {
-              setBalanceFetched(false);
-              setBalance(0);
-              changeNetwork("devnet");
-            }}
-          />
-          <FormControlLabel
-            value={true}
-            control={<Radio />}
-            label="Mainnet"
-            onClick={() => {
-              setBalanceFetched(false);
-              setBalance(0);
-              changeNetwork("mainnet");
-            }}
-          />
-        </RadioGroup>
+          <MenuItem value={"devnet"}>Devnet</MenuItem>
+          <MenuItem value={"mainnet"}>Mainnet</MenuItem>
+        </Select>
       </FormControl>
 
       <Box style={{ flexWrap: "wrap", margin: 5 }}>
@@ -219,65 +197,58 @@ export const WalletSolana: FC<{
       </Box>
 
       <Dialog
-        className="dark-dialog "
+        className="dark-dialog"
         onClose={() => setOpenImportToken(false)}
         open={openImportToken}
       >
-        <Box className="join-container" sx={{ minHeight: 0 }}>
-          <DialogTitle sx={{ pt: 0 }}>SPL Tokens</DialogTitle>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <FormControl fullWidth>
-              <InputLabel>Import Token</InputLabel>
-              <OutlinedInput
-                value={tokenToImport}
-                label="Import Token"
-                onChange={(e) => setTokenToImport(e.target.value)}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => {
-                        if (provider !== null) {
-                          toast.success("Importing tokens!");
-                          importToken(
-                            provider,
-                            publicKey,
-                            connection,
-                            tokenToImport
-                          );
-                        }
-                      }}
-                    >
-                      <UploadIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => {
-                        if (provider !== null) {
-                          toast.success("SPL Tokens logged to console!");
-                          viewTokenAccounts(provider, publicKey, connection);
-                        }
-                      }}
-                    >
-                      <NotesIcon />
-                    </IconButton>
+        <DialogTitle sx={{ textAlign: "center" }}>SPL Tokens</DialogTitle>
+        <Box>
+          <FormControl fullWidth>
+            <InputLabel>Import Token</InputLabel>
+            <OutlinedInput
+              value={tokenToImport}
+              label="Import Token"
+              onChange={(e) => setTokenToImport(e.target.value)}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => {
+                      if (provider !== null) {
+                        toast.success("Importing tokens!");
+                        importToken(
+                          provider,
+                          publicKey,
+                          connection,
+                          tokenToImport
+                        );
+                      }
+                    }}
+                  >
+                    <UploadIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => {
+                      if (provider !== null) {
+                        toast.success("SPL Tokens logged to console!");
+                        viewTokenAccounts(provider, publicKey, connection);
+                      }
+                    }}
+                  >
+                    <NotesIcon />
+                  </IconButton>
 
-                    <IconButton
-                      onClick={() => {
-                        setOpenImportToken(false);
-                      }}
-                    >
-                      <CloseIcon />
-                    </IconButton>
-                  </InputAdornment>
-                }
-                fullWidth
-              />
-            </FormControl>
-          </Box>
+                  <IconButton
+                    onClick={() => {
+                      setOpenImportToken(false);
+                    }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </InputAdornment>
+              }
+              fullWidth
+            />
+          </FormControl>
         </Box>
       </Dialog>
 
@@ -290,6 +261,6 @@ export const WalletSolana: FC<{
           setOpenMint={setOpenMint}
         />
       )}
-    </Box>
+    </>
   );
 };

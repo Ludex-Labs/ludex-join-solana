@@ -39,7 +39,6 @@ export const NFTJoin: FC<{
   isMainnet: boolean;
   challengeAddress: string;
   connection: Connection;
-  playerStatus: string;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
   sendTransaction?: (tx: Transaction) => Promise<string>;
@@ -50,7 +49,6 @@ export const NFTJoin: FC<{
     isMainnet,
     challengeAddress,
     connection,
-    playerStatus,
     isLoading,
     setIsLoading,
     sendTransaction,
@@ -62,6 +60,62 @@ export const NFTJoin: FC<{
   const [offerings, setOfferings] = useState<any>([]);
   const [openOffering, setOpenOffering] = useState<boolean>(false);
   const [accepted, setAccepted] = useState<boolean>(false);
+  const [playerStatus, setPlayerStatus] = useState<string>("");
+
+  useEffect(() => {
+    if (challengeAddress.length !== 44) return;
+    getPlayerStatus();
+  }, [challengeAddress]);
+
+  const getPlayerStatus = async () => {
+    if (!wallet) return;
+    // "NOT_IN_GAME" | "ACCEPTED" | "JOINED"
+    var playerStatus = await NFTChallenge.NftChallengeTXClient.getPlayerStatus(
+      connection,
+      wallet?.publicKey,
+      challengeAddress
+    );
+    setPlayerStatus(playerStatus);
+    toast.success("Player status: " + playerStatus);
+  };
+
+  const joinNFTChallenge = async () => {
+    if (publicKey === "") throw Error("Not connected");
+    if (!wallet || !sendTransaction) return;
+    setIsLoading(true);
+    const ludexTx = new NFTChallenge.NftChallengeTXClient(
+      connection,
+      challengeAddress,
+      {
+        wallet: wallet,
+      }
+    );
+    ludexTx
+      .join(wallet.publicKey.toBase58())
+      .getTx()
+      .then((tx) => {
+        connection
+          .getLatestBlockhash()
+          .then((result) => {
+            tx.recentBlockhash = result.blockhash;
+            if (!sendTransaction)
+              throw new Error("Failed to send transaction.");
+            return sendTransaction(tx);
+          })
+          .then((signature) => {
+            if (!signature.toString().includes("Error")) {
+              setIsLoading(false);
+              setPlayerStatus("JOINED");
+              toast.success("NFT Challenge joined!");
+            } else throw new Error(signature);
+          })
+          .catch((e) => {
+            console.error(e);
+            toast.error("Failed to join challenge");
+            setIsLoading(false);
+          });
+      });
+  };
 
   useEffect(() => {
     if (challengeAddress.length === 44) {
@@ -202,9 +256,31 @@ export const NFTJoin: FC<{
 
   return (
     <>
+      <Button
+        fullWidth
+        variant="contained"
+        size="large"
+        sx={{ mt: 1 }}
+        onClick={() => joinNFTChallenge()}
+        disabled={
+          isLoading ||
+          challengeAddress.length !== 44 ||
+          playerStatus === "JOINED" ||
+          playerStatus === "ACCEPTED"
+        }
+      >
+        {playerStatus === "JOINED" || playerStatus === "ACCEPTED" ? (
+          <>
+            <CheckCircleOutlineIcon sx={{ mr: 1 }} />
+            Joined
+          </>
+        ) : (
+          "Join"
+        )}
+      </Button>
+
       <FormControl fullWidth sx={{ mb: 0, mt: 4 }}>
         <InputLabel>Offerings</InputLabel>
-
         <Select
           multiple
           native
@@ -260,7 +336,6 @@ export const NFTJoin: FC<{
         disabled={
           isLoading ||
           accepted ||
-          playerStatus === "JOINED" ||
           playerStatus === "ACCEPTED" ||
           challengeAddress.length !== 44
         }

@@ -65,62 +65,57 @@ export const NFTMint: FC<{
   };
 
   return (
-    <Box>
-      <Dialog
-        className="dark-dialog "
-        onClose={() => setOpenMint(false)}
-        open={openMint}
-      >
+    <Dialog
+      className="dark-dialog "
+      onClose={() => setOpenMint(false)}
+      open={openMint}
+    >
+      <Box>
+        <DialogTitle> Mint Test NFT</DialogTitle>
         <Box
-          className="join-container"
-          sx={{ minHeight: 0, borderRadius: "32px" }}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+          }}
         >
-          <DialogTitle sx={{ pt: 0 }}> Mint Test NFT</DialogTitle>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <TextField
-              fullWidth
-              size="small"
-              label="Name"
-              sx={{ mb: 2 }}
-              value={name}
-              disabled={isLoading}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <TextField
-              fullWidth
-              size="small"
-              label="Symbol"
-              sx={{ mb: 2 }}
-              value={symbol}
-              disabled={isLoading}
-              onChange={(e) => setSymbol(e.target.value)}
-            />
-            <TextField
-              fullWidth
-              size="small"
-              label="URI"
-              sx={{ mb: 2 }}
-              value={uri}
-              disabled={isLoading}
-              onChange={(e) => setUri(e.target.value)}
-            />
+          <TextField
+            fullWidth
+            size="small"
+            label="Name"
+            sx={{ mb: 3 }}
+            value={name}
+            disabled={isLoading}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <TextField
+            fullWidth
+            size="small"
+            label="Symbol"
+            sx={{ mb: 3 }}
+            value={symbol}
+            disabled={isLoading}
+            onChange={(e) => setSymbol(e.target.value)}
+          />
+          <TextField
+            fullWidth
+            size="small"
+            label="URI"
+            sx={{ mb: 3 }}
+            value={uri}
+            disabled={isLoading}
+            onChange={(e) => setUri(e.target.value)}
+          />
 
-            <Button
-              disabled={isLoading}
-              variant="contained"
-              onClick={() => mintNft()}
-              sx={{ m: 1 }}
-            >
-              Mint NFT
-            </Button>
-          </Box>
+          <Button
+            disabled={isLoading}
+            variant="contained"
+            onClick={() => mintNft()}
+            sx={{ m: 1 }}
+          >
+            Mint NFT
+          </Button>
         </Box>
-      </Dialog>
-    </Box>
+      </Box>
+    </Dialog>
   );
 };
