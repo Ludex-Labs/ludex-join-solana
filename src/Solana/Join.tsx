@@ -1,12 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { FC, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import { Challenge, NFTChallenge } from "@ludex-labs/ludex-sdk-js";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
 import { Connection, Transaction } from "@solana/web3.js";
-import { toast } from "react-hot-toast";
+import { SolanaWallet } from "@web3auth/solana-provider";
+import { SafeEventEmitterProvider } from "@web3auth/base";
 import { NFTJoin } from "./NFTJoin";
-import DescriptionIcon from "@mui/icons-material/Description";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+
+// MUI
 import {
   Box,
   Button,
@@ -19,23 +21,19 @@ import {
   OutlinedInput,
   InputAdornment,
 } from "@mui/material";
+import DescriptionIcon from "@mui/icons-material/Description";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 export const Join: FC<{
   publicKey: string;
+  provider: SafeEventEmitterProvider | null;
   wallet?: Wallet;
   isMainnet: boolean;
   connection: Connection;
   changeNetwork: (network: string) => void;
-  sendTransaction?: (tx: Transaction) => Promise<string>;
 }> = (props) => {
-  const {
-    publicKey,
-    wallet,
-    isMainnet,
-    connection,
-    changeNetwork,
-    sendTransaction,
-  } = props;
+  const { publicKey, provider, wallet, isMainnet, connection, changeNetwork } =
+    props;
   const [type, setType] = useState<string>("FT");
   const [joined, setJoined] = useState<boolean>(false);
   const [challengeAddress, setChallengeAddress] = useState<string>("");
@@ -69,6 +67,26 @@ export const Join: FC<{
     );
     setPlayerStatus(playerStatus);
     toast.success("Player status: " + playerStatus);
+  };
+
+  const sendTransaction = async (transaction: Transaction): Promise<string> => {
+    try {
+      if (!provider) {
+        console.error("provider not initialized yet");
+        return "";
+      }
+      const solanaWallet = new SolanaWallet(provider);
+      transaction = await solanaWallet.signTransaction(transaction);
+      if (connection) {
+        const signature = await connection.sendRawTransaction(
+          transaction.serialize()
+        );
+        return signature;
+      }
+      return "";
+    } catch (error) {
+      return error as string;
+    }
   };
 
   const submitFTChallenge = async () => {

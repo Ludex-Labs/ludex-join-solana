@@ -2,7 +2,7 @@
 import { FC, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { RPC, getTestSol, viewTokenAccounts, importToken } from "./RPC";
-import { Connection, Transaction } from "@solana/web3.js";
+import { Connection } from "@solana/web3.js";
 import { NFTMint } from "./NFTMint";
 import { SafeEventEmitterProvider } from "@web3auth/base";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
@@ -34,7 +34,6 @@ export const WalletSolana: FC<{
   connection: Connection;
   wallet: Wallet | undefined;
   changeNetwork: (network: string) => void;
-  sendTransaction: ((tx: Transaction) => Promise<string>) | undefined;
   logout: () => void;
 }> = (props) => {
   const {
@@ -44,7 +43,6 @@ export const WalletSolana: FC<{
     connection,
     wallet,
     changeNetwork,
-    sendTransaction,
     logout,
   } = props;
   const [balanceFetched, setBalanceFetched] = useState(false);
@@ -276,7 +274,6 @@ export const WalletSolana: FC<{
         <NFTMint
           publicKey={publicKey}
           wallet={wallet}
-          sendTransaction={sendTransaction}
           connection={connection}
         />
       )}

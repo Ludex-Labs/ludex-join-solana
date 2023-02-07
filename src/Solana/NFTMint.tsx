@@ -1,12 +1,7 @@
 import { FC, useState } from "react";
 import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
-import {
-  clusterApiUrl,
-  Connection,
-  Transaction,
-  PublicKey,
-} from "@solana/web3.js";
+import { clusterApiUrl, Connection, PublicKey } from "@solana/web3.js";
 import { Button, Typography, TextField, Box, Divider } from "@mui/material";
 import { toast } from "react-hot-toast";
 
@@ -16,7 +11,6 @@ const metaplex = Metaplex.make(connection);
 export const NFTMint: FC<{
   publicKey: string;
   wallet?: Wallet;
-  sendTransaction?: (tx: Transaction) => Promise<string>;
   connection: Connection;
 }> = (props) => {
   const { publicKey, wallet } = props;

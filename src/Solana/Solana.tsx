@@ -4,27 +4,25 @@ import { toast } from "react-hot-toast";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
 import { Join } from "./Join";
 import { WalletSolana } from "./WalletSolana";
-import { Connection, Transaction, PublicKey } from "@solana/web3.js";
+import { Connection } from "@solana/web3.js";
 import { RPC } from "./RPC";
 
 // Web3Auth
 import { Web3Auth } from "@web3auth/modal";
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
-import { SolanaWallet } from "@web3auth/solana-provider";
 
 // MUI
 import WalletIcon from "@mui/icons-material/Wallet";
-import { Box, IconButton, Button } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 
-export const Solana = (props: any) => {
+export const Solana = () => {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
     null
   );
 
   const [wallet, setWallet] = useState<Wallet | undefined>();
-  const [publicKey, setPublicKey] = useState("");
   const [viewWallet, setViewWallet] = useState(false);
 
   const [connection, setConnection] = useState<Connection | null>(null);
@@ -112,9 +110,6 @@ export const Solana = (props: any) => {
     const rpc = new RPC(web3auth?.provider);
     const wallet = await rpc.getWallet();
     setWallet(wallet);
-
-    const publicKey = await rpc.getAccounts();
-    setPublicKey(publicKey[0]);
   };
 
   const changeNetwork = async (network: string) => {
@@ -134,46 +129,25 @@ export const Solana = (props: any) => {
     setIsMainnet(isMainnet);
   };
 
-  const sendTransaction = async (transaction: Transaction): Promise<string> => {
-    try {
-      if (!provider) {
-        console.error("provider not initialized yet");
-        return "";
-      }
-      const solanaWallet = new SolanaWallet(provider);
-      transaction = await solanaWallet.signTransaction(transaction);
-      if (connection) {
-        const signature = await connection.sendRawTransaction(
-          transaction.serialize()
-        );
-        return signature;
-      }
-      return "";
-    } catch (error) {
-      return error as string;
-    }
-  };
-
   return (
     <>
       <img alt="solana" src="./assets/solana.svg" className="chain-container" />
-      <Box className="join-container">
+      <span className="join-container">
         {provider && viewWallet && connection ? (
           <WalletSolana
-            publicKey={publicKey}
+            publicKey={wallet?.publicKey?.toString() || ""}
             provider={provider}
             changeNetwork={changeNetwork}
             isMainnet={isMainnet}
-            sendTransaction={sendTransaction}
             connection={connection}
             wallet={wallet}
             logout={logout}
           />
         ) : provider && connection != null ? (
           <Join
-            publicKey={publicKey}
+            publicKey={wallet?.publicKey?.toString() || ""}
+            provider={provider}
             wallet={wallet}
-            sendTransaction={sendTransaction}
             isMainnet={isMainnet}
             changeNetwork={changeNetwork}
             connection={connection}
@@ -183,14 +157,12 @@ export const Solana = (props: any) => {
             Sign In
           </Button>
         )}
-      </Box>
+      </span>
 
       {provider && (
-        <Box sx={{ mt: 3 }}>
-          <IconButton onClick={() => setViewWallet(!viewWallet)}>
-            <WalletIcon />
-          </IconButton>
-        </Box>
+        <IconButton onClick={() => setViewWallet(!viewWallet)} sx={{ mt: 2 }}>
+          <WalletIcon />
+        </IconButton>
       )}
     </>
   );
