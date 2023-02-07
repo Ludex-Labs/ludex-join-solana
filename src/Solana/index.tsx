@@ -125,7 +125,7 @@ export const Solana = () => {
     <>
       <img alt="solana" src="./assets/solana.svg" className="chain-container" />
       <span className="join-container">
-        {provider && viewWallet && connection ? (
+        {provider && connection && viewWallet ? (
           <WalletSolana
             publicKey={wallet?.publicKey?.toString() || ""}
             provider={provider}

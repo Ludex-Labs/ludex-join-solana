@@ -1,6 +1,6 @@
 import "./App.css";
 import { Toaster } from "react-hot-toast";
-import { Solana } from "./Solana/Solana";
+import { Solana } from "./Solana/index";
 import { Box } from "@mui/material";
 // @ts-ignore
 import StarfieldAnimation from "react-starfield-animation";

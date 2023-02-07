@@ -41,7 +41,6 @@ export const NFTJoin: FC<{
   connection: Connection;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
-  sendTransaction?: (tx: Transaction) => Promise<string>;
 }> = (props) => {
   const {
     publicKey,
@@ -51,7 +50,6 @@ export const NFTJoin: FC<{
     connection,
     isLoading,
     setIsLoading,
-    sendTransaction,
   } = props;
   const [open, setOpen] = useState<boolean>(false);
   const [NFTmint, setNFTmint] = useState<string>("");
@@ -81,7 +79,7 @@ export const NFTJoin: FC<{
 
   const joinNFTChallenge = async () => {
     if (publicKey === "") throw Error("Not connected");
-    if (!wallet || !sendTransaction) return;
+    if (!wallet || !wallet?.signTransaction) return;
     setIsLoading(true);
     const ludexTx = new NFTChallenge.NftChallengeTXClient(
       connection,
@@ -98,16 +96,16 @@ export const NFTJoin: FC<{
           .getLatestBlockhash()
           .then((result) => {
             tx.recentBlockhash = result.blockhash;
-            if (!sendTransaction)
+            if (!wallet?.signTransaction)
               throw new Error("Failed to send transaction.");
-            return sendTransaction(tx);
+            return wallet?.signTransaction(tx);
           })
           .then((signature) => {
             if (!signature.toString().includes("Error")) {
               setIsLoading(false);
               setPlayerStatus("JOINED");
               toast.success("NFT Challenge joined!");
-            } else throw new Error(signature);
+            } else throw new Error(signature.toString());
           })
           .catch((e) => {
             console.error(e);
@@ -172,7 +170,7 @@ export const NFTJoin: FC<{
       const result = await connection.getLatestBlockhash();
       tx.recentBlockhash = result.blockhash;
       tx.feePayer = new PublicKey(publicKey);
-      if (sendTransaction) await sendTransaction(tx);
+      if (wallet?.signTransaction) await wallet?.signTransaction(tx);
       setIsLoading(false);
       setOpen(false);
       getOfferings();
@@ -199,9 +197,10 @@ export const NFTJoin: FC<{
       const result = await connection.getLatestBlockhash();
       tx.recentBlockhash = result.blockhash;
       tx.feePayer = new PublicKey(publicKey);
-      if (sendTransaction) {
-        const res = await sendTransaction(tx);
-        if (res.toString().includes("Error")) throw new Error(res);
+      if (wallet?.signTransaction) {
+        const signature = await wallet?.signTransaction(tx);
+        if (signature.toString().includes("Error"))
+          throw new Error(signature.toString());
         toast.success("Offering removing");
         setOpenOffering(false);
       }
@@ -227,13 +226,13 @@ export const NFTJoin: FC<{
       const result = await connection.getLatestBlockhash();
       tx.recentBlockhash = result.blockhash;
       tx.feePayer = new PublicKey(publicKey);
-      if (!sendTransaction) return;
-      const signature = await sendTransaction(tx);
+      if (!wallet?.signTransaction) return;
+      const signature = await wallet?.signTransaction(tx);
       if (!signature.toString().includes("Error")) {
         setIsLoading(false);
         setAccepted(true);
         toast.success("Offering accepted");
-      } else throw new Error(signature);
+      } else throw new Error(signature.toString());
       setIsLoading(false);
     } catch (e) {
       console.error(e);
