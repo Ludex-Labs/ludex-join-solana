@@ -21,12 +21,10 @@ export const Solana = () => {
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
     null
   );
-
-  const [wallet, setWallet] = useState<Wallet | undefined>();
-  const [viewWallet, setViewWallet] = useState(false);
-
   const [connection, setConnection] = useState<Connection | null>(null);
   const [isMainnet, setIsMainnet] = useState<boolean>(false);
+  const [wallet, setWallet] = useState<Wallet | undefined>();
+  const [viewWallet, setViewWallet] = useState(false);
 
   const chainConfigSolana = {
     chainNamespace: CHAIN_NAMESPACES.SOLANA,
@@ -114,17 +112,11 @@ export const Solana = () => {
 
   const changeNetwork = async (network: string) => {
     const isMainnet = network === "mainnet";
-    var connection;
-    if (!isMainnet) {
-      connection = new Connection(
-        process.env.REACT_APP_SOLANA_RPC || "https://rpc.ankr.com/solana"
-      );
-    } else if (isMainnet) {
-      connection = new Connection(
-        process.env.REACT_APP_SOLANA_RPC_MAINNET ||
-          "https://rpc.ankr.com/solana"
-      );
-    }
+    var connection = new Connection(
+      isMainnet && process.env.REACT_APP_SOLANA_RPC_MAINNET != null
+        ? process.env.REACT_APP_SOLANA_RPC_MAINNET
+        : process.env.REACT_APP_SOLANA_RPC || "https://rpc.ankr.com/solana"
+    );
     setConnection(connection || null);
     setIsMainnet(isMainnet);
   };
@@ -137,10 +129,10 @@ export const Solana = () => {
           <WalletSolana
             publicKey={wallet?.publicKey?.toString() || ""}
             provider={provider}
-            changeNetwork={changeNetwork}
+            wallet={wallet}
             isMainnet={isMainnet}
             connection={connection}
-            wallet={wallet}
+            changeNetwork={changeNetwork}
             logout={logout}
           />
         ) : provider && connection != null ? (
@@ -149,8 +141,8 @@ export const Solana = () => {
             provider={provider}
             wallet={wallet}
             isMainnet={isMainnet}
-            changeNetwork={changeNetwork}
             connection={connection}
+            changeNetwork={changeNetwork}
           />
         ) : (
           <Button variant={"contained"} onClick={() => login()}>

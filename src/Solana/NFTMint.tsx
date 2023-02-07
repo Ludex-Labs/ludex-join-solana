@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
 import { clusterApiUrl, Connection, PublicKey } from "@solana/web3.js";
-import { Button, Typography, TextField, Box, Divider } from "@mui/material";
+import { Box, Button, Dialog, DialogTitle, TextField } from "@mui/material";
 import { toast } from "react-hot-toast";
 
 const connection = new Connection(clusterApiUrl("devnet"));
@@ -12,8 +12,10 @@ export const NFTMint: FC<{
   publicKey: string;
   wallet?: Wallet;
   connection: Connection;
+  openMint: boolean;
+  setOpenMint: (open: boolean) => void;
 }> = (props) => {
-  const { publicKey, wallet } = props;
+  const { publicKey, wallet, openMint, setOpenMint } = props;
 
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("My NFT");
@@ -64,46 +66,61 @@ export const NFTMint: FC<{
 
   return (
     <Box>
-      <Divider sx={{ mb: 3, mt: 3 }} />
-      <Typography variant={"h6"} sx={{ mb: 2 }}>
-        Mint Test NFT
-      </Typography>
-      <TextField
-        fullWidth
-        size="small"
-        label="Name"
-        sx={{ mb: 2 }}
-        value={name}
-        disabled={isLoading}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <TextField
-        fullWidth
-        size="small"
-        label="Symbol"
-        sx={{ mb: 2 }}
-        value={symbol}
-        disabled={isLoading}
-        onChange={(e) => setSymbol(e.target.value)}
-      />
-      <TextField
-        fullWidth
-        size="small"
-        label="URI"
-        sx={{ mb: 2 }}
-        value={uri}
-        disabled={isLoading}
-        onChange={(e) => setUri(e.target.value)}
-      />
-
-      <Button
-        disabled={isLoading}
-        variant="contained"
-        onClick={() => mintNft()}
-        sx={{ m: 1 }}
+      <Dialog
+        className="dark-dialog "
+        onClose={() => setOpenMint(false)}
+        open={openMint}
       >
-        Mint NFT
-      </Button>
+        <Box
+          className="join-container"
+          sx={{ minHeight: 0, borderRadius: "32px" }}
+        >
+          <DialogTitle sx={{ pt: 0 }}> Mint Test NFT</DialogTitle>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <TextField
+              fullWidth
+              size="small"
+              label="Name"
+              sx={{ mb: 2 }}
+              value={name}
+              disabled={isLoading}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <TextField
+              fullWidth
+              size="small"
+              label="Symbol"
+              sx={{ mb: 2 }}
+              value={symbol}
+              disabled={isLoading}
+              onChange={(e) => setSymbol(e.target.value)}
+            />
+            <TextField
+              fullWidth
+              size="small"
+              label="URI"
+              sx={{ mb: 2 }}
+              value={uri}
+              disabled={isLoading}
+              onChange={(e) => setUri(e.target.value)}
+            />
+
+            <Button
+              disabled={isLoading}
+              variant="contained"
+              onClick={() => mintNft()}
+              sx={{ m: 1 }}
+            >
+              Mint NFT
+            </Button>
+          </Box>
+        </Box>
+      </Dialog>
     </Box>
   );
 };

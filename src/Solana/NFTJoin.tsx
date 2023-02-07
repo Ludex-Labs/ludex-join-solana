@@ -4,9 +4,14 @@ import { Metaplex, guestIdentity } from "@metaplex-foundation/js";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
 import { toast } from "react-hot-toast";
 import { NFTChallenge } from "@ludex-labs/ludex-sdk-js";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import DescriptionIcon from "@mui/icons-material/Description";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
+
+// MUI
 import {
   Box,
   Button,
@@ -24,34 +29,31 @@ import {
   InputAdornment,
   IconButton,
 } from "@mui/material";
-import {
-  Connection,
-  PublicKey,
-  Transaction,
-  LAMPORTS_PER_SOL,
-} from "@solana/web3.js";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import DescriptionIcon from "@mui/icons-material/Description";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 export const NFTJoin: FC<{
   publicKey: string;
   wallet?: Wallet;
-  sendTransaction?: (tx: Transaction) => Promise<string>;
   isMainnet: boolean;
   challengeAddress: string;
   connection: Connection;
   playerStatus: string;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
+  sendTransaction?: (tx: Transaction) => Promise<string>;
 }> = (props) => {
   const {
     publicKey,
     wallet,
-    sendTransaction,
     isMainnet,
     challengeAddress,
     connection,
     playerStatus,
     isLoading,
     setIsLoading,
+    sendTransaction,
   } = props;
   const [open, setOpen] = useState<boolean>(false);
   const [NFTmint, setNFTmint] = useState<string>("");

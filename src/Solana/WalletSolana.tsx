@@ -24,7 +24,8 @@ import {
   FormControlLabel,
   Radio,
   Typography,
-  Divider,
+  Dialog,
+  DialogTitle,
 } from "@mui/material";
 
 export const WalletSolana: FC<{
@@ -216,65 +217,77 @@ export const WalletSolana: FC<{
           Logout
         </Button>
       </Box>
-      {openImportToken && (
-        <>
-          <Divider sx={{ mb: 3, mt: 3 }} />
-          <Typography variant={"h6"} sx={{ mb: 2 }}>
-            SPL Tokens
-          </Typography>
-          <FormControl fullWidth>
-            <InputLabel>Import</InputLabel>
-            <OutlinedInput
-              value={tokenToImport}
-              label="Import Token"
-              onChange={(e) => setTokenToImport(e.target.value)}
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => {
-                      if (provider !== null) {
-                        toast.success("Importing tokens!");
-                        importToken(
-                          provider,
-                          publicKey,
-                          connection,
-                          tokenToImport
-                        );
-                      }
-                    }}
-                  >
-                    <UploadIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => {
-                      if (provider !== null) {
-                        toast.success("SPL Tokens logged to console!");
-                        viewTokenAccounts(provider, publicKey, connection);
-                      }
-                    }}
-                  >
-                    <NotesIcon />
-                  </IconButton>
 
-                  <IconButton
-                    onClick={() => {
-                      setOpenImportToken(false);
-                    }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                </InputAdornment>
-              }
-              fullWidth
-            />
-          </FormControl>
-        </>
-      )}
-      {openMint && connection !== null && (
+      <Dialog
+        className="dark-dialog "
+        onClose={() => setOpenImportToken(false)}
+        open={openImportToken}
+      >
+        <Box className="join-container" sx={{ minHeight: 0 }}>
+          <DialogTitle sx={{ pt: 0 }}>SPL Tokens</DialogTitle>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <FormControl fullWidth>
+              <InputLabel>Import Token</InputLabel>
+              <OutlinedInput
+                value={tokenToImport}
+                label="Import Token"
+                onChange={(e) => setTokenToImport(e.target.value)}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => {
+                        if (provider !== null) {
+                          toast.success("Importing tokens!");
+                          importToken(
+                            provider,
+                            publicKey,
+                            connection,
+                            tokenToImport
+                          );
+                        }
+                      }}
+                    >
+                      <UploadIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => {
+                        if (provider !== null) {
+                          toast.success("SPL Tokens logged to console!");
+                          viewTokenAccounts(provider, publicKey, connection);
+                        }
+                      }}
+                    >
+                      <NotesIcon />
+                    </IconButton>
+
+                    <IconButton
+                      onClick={() => {
+                        setOpenImportToken(false);
+                      }}
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                  </InputAdornment>
+                }
+                fullWidth
+              />
+            </FormControl>
+          </Box>
+        </Box>
+      </Dialog>
+
+      {connection !== null && (
         <NFTMint
           publicKey={publicKey}
           wallet={wallet}
           connection={connection}
+          openMint={openMint}
+          setOpenMint={setOpenMint}
         />
       )}
     </Box>
