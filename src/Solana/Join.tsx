@@ -50,31 +50,28 @@ export const Join: FC<{
     })();
   }, [publicKey]);
 
-  // const sendTransaction = async (transaction: Transaction): Promise<string> => {
-  //   try {
-  //     if (!provider) {
-  //       console.error("provider not initialized yet");
-  //       return "";
-  //     }
-  //     const solanaWallet = new SolanaWallet(provider);
-  //     transaction = await solanaWallet.signTransaction(transaction);
-  //     if (connection) {
-  //       const signature = await connection.sendRawTransaction(
-  //         transaction.serialize()
-  //       );
-  //       return signature;
-  //     }
-  //     return "";
-  //   } catch (error) {
-  //     return error as string;
-  //   }
-  // };
-
-  console.log(wallet?.signTransaction);
-  // console.log(sendTransaction);
+  const sendTransaction = async (transaction: Transaction): Promise<string> => {
+    try {
+      if (!provider) {
+        console.error("provider not initialized yet");
+        return "";
+      }
+      const solanaWallet = new SolanaWallet(provider);
+      transaction = await solanaWallet.signTransaction(transaction);
+      if (connection) {
+        const signature = await connection.sendRawTransaction(
+          transaction.serialize()
+        );
+        return signature;
+      }
+      return "";
+    } catch (error) {
+      return error as string;
+    }
+  };
 
   const joinFTChallenge = async () => {
-    if (!wallet || !wallet?.signTransaction) return;
+    if (!wallet || !sendTransaction) return;
     setIsLoading(true);
     const ludexTx = new Challenge.ChallengeTXClient(
       connection,
@@ -92,16 +89,16 @@ export const Join: FC<{
           .getLatestBlockhash() //.getRecentBlockhash()
           .then((result) => {
             tx.recentBlockhash = result.blockhash;
-            if (!wallet?.signTransaction)
+            if (!sendTransaction)
               throw new Error("Failed to send transaction.");
-            return wallet?.signTransaction(tx);
+            return sendTransaction(tx);
           })
           .then((signature) => {
             if (!signature.toString().includes("Error")) {
               setJoined(true);
               setIsLoading(false);
               toast.success("FT Challenge joined!");
-            } else throw new Error(signature.toString());
+            } else throw new Error(signature);
           })
           .catch((e) => {
             console.error(e);
@@ -198,6 +195,7 @@ export const Join: FC<{
         <NFTJoin
           publicKey={publicKey}
           wallet={wallet}
+          sendTransaction={sendTransaction}
           isMainnet={isMainnet}
           challengeAddress={challengeAddress}
           connection={connection}

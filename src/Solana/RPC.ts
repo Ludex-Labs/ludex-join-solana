@@ -41,16 +41,28 @@ export class RPC {
     }
   };
 
-  // signMessage = async (): Promise<string> => {
-  //   try {
-  //     const solanaWallet = new SolanaWallet(this.provider);
-  //     const msg = Buffer.from("Test Signing Message ", "utf8");
-  //     const res = await solanaWallet.signMessage(msg);
-  //     return res.toString();
-  //   } catch (error) {
-  //     return error as string;
-  //   }
-  // };
+  signMessage = async (): Promise<string> => {
+    try {
+      const solanaWallet = new SolanaWallet(this.provider);
+      const msg = Buffer.from("Test Signing Message ", "utf8");
+      const res = await solanaWallet.signMessage(msg);
+      return res.toString();
+    } catch (error) {
+      return error as string;
+    }
+  };
+
+  sendTransaction = async (transaction: Transaction): Promise<string> => {
+    try {
+      const solanaWallet = new SolanaWallet(this.provider);
+      const { signature } = await solanaWallet.signAndSendTransaction(
+        transaction
+      );
+      return signature;
+    } catch (error) {
+      return error as string;
+    }
+  };
 
   signTransaction = async (transaction: Transaction): Promise<Transaction> => {
     try {
@@ -59,38 +71,6 @@ export class RPC {
       return tx;
     } catch (error) {
       throw error;
-    }
-  };
-
-  // signAndSendTransaction = async (
-  //   transaction: Transaction
-  // ): Promise<string> => {
-  //   try {
-  //     const solanaWallet = new SolanaWallet(this.provider);
-  //     const { signature } = await solanaWallet.signAndSendTransaction(
-  //       transaction
-  //     );
-  //     return signature;
-  //   } catch (error) {
-  //     return error as string;
-  //   }
-  // };
-
-  sendTransaction = async (
-    transaction: Transaction,
-    connection: Connection
-  ): Promise<String> => {
-    try {
-      const solanaWallet = new SolanaWallet(this.provider);
-      transaction = await solanaWallet.signTransaction(transaction);
-      if (connection) {
-        const signature = await connection.sendRawTransaction(
-          transaction.serialize()
-        );
-        return signature;
-      } else return "";
-    } catch (error) {
-      return error as string;
     }
   };
 
