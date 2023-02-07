@@ -29,7 +29,6 @@ import {
 
 export const WalletSolana: FC<{
   provider: SafeEventEmitterProvider | null;
-  network: string;
   publicKey: string;
   isMainnet: boolean;
   connection: Connection;
@@ -40,13 +39,12 @@ export const WalletSolana: FC<{
 }> = (props) => {
   const {
     provider,
-    network,
     publicKey,
-    changeNetwork,
     isMainnet,
-    sendTransaction,
     connection,
     wallet,
+    changeNetwork,
+    sendTransaction,
     logout,
   } = props;
   const [balanceFetched, setBalanceFetched] = useState(false);
@@ -65,7 +63,7 @@ export const WalletSolana: FC<{
       return;
     }
     const rpc = new RPC(provider);
-    const balance = await rpc.getBalance(network);
+    const balance = await rpc.getBalance(connection);
     setBalance(parseInt(balance));
     setBalanceFetched(true);
   };
@@ -147,7 +145,7 @@ export const WalletSolana: FC<{
             onClick={() => {
               setBalanceFetched(false);
               setBalance(0);
-              changeNetwork("Devnet");
+              changeNetwork("devnet");
             }}
           />
           <FormControlLabel
@@ -157,7 +155,7 @@ export const WalletSolana: FC<{
             onClick={() => {
               setBalanceFetched(false);
               setBalance(0);
-              changeNetwork("Mainnet");
+              changeNetwork("mainnet");
             }}
           />
         </RadioGroup>
@@ -241,7 +239,7 @@ export const WalletSolana: FC<{
                         importToken(
                           provider,
                           publicKey,
-                          network,
+                          connection,
                           tokenToImport
                         );
                       }
@@ -253,7 +251,7 @@ export const WalletSolana: FC<{
                     onClick={() => {
                       if (provider !== null) {
                         toast.success("SPL Tokens logged to console!");
-                        viewTokenAccounts(provider, publicKey, network);
+                        viewTokenAccounts(provider, publicKey, connection);
                       }
                     }}
                   >

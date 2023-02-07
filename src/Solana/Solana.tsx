@@ -1,49 +1,42 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
 import { Join } from "./Join";
 import { WalletSolana } from "./WalletSolana";
-import WalletIcon from "@mui/icons-material/Wallet";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Box, IconButton, Button } from "@mui/material";
-import { toast } from "react-hot-toast";
+import { Connection, Transaction, PublicKey } from "@solana/web3.js";
+import { RPC } from "./RPC";
 
 // Web3Auth
 import { Web3Auth } from "@web3auth/modal";
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
-import RPC from "./_RPC";
+import { SolanaWallet } from "@web3auth/solana-provider";
 
-// Solana
-import {
-  SolanaPrivateKeyProvider,
-  SolanaWallet,
-} from "@web3auth/solana-provider";
-import { Connection, Transaction, PublicKey } from "@solana/web3.js";
+// MUI
+import WalletIcon from "@mui/icons-material/Wallet";
+import { Box, IconButton, Button } from "@mui/material";
 
 export const Solana = (props: any) => {
-  const [viewWallet, setViewWallet] = useState(false);
-  const [wallet, setWallet] = useState<Wallet | undefined>();
-  const [publicKey, setPublicKey] = useState("");
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
     null
   );
-  const [providerSolana, setProviderSolana] =
-    useState<SafeEventEmitterProvider | null>(null);
-  const [network, setNetwork] = useState("");
-  const [connection, setConnection] = useState<Connection | null>(null);
 
-  const isMainnet = network.includes("winter-little");
+  const [wallet, setWallet] = useState<Wallet | undefined>();
+  const [publicKey, setPublicKey] = useState("");
+  const [viewWallet, setViewWallet] = useState(false);
+
+  const [connection, setConnection] = useState<Connection | null>(null);
+  const [isMainnet, setIsMainnet] = useState<boolean>(false);
 
   const chainConfigSolana = {
     chainNamespace: CHAIN_NAMESPACES.SOLANA,
     chainId: isMainnet ? "0x3" : "0x1",
-    //rpcTarget: "https://rpc.ankr.com/solana"
     rpcTarget:
       isMainnet && process.env.REACT_APP_SOLANA_RPC_MAINNET != null
         ? process.env.REACT_APP_SOLANA_RPC_MAINNET
-        : process.env.REACT_APP_SOLANA_RPC || "",
+        : process.env.REACT_APP_SOLANA_RPC || "https://rpc.ankr.com/solana",
     displayName: "Solana Mainnet",
     blockExplorer: "https://explorer.solana.com/",
     ticker: "SOL",
@@ -73,7 +66,7 @@ export const Solana = (props: any) => {
 
       if (web3auth.provider) {
         setProvider(web3auth.provider);
-        setupSolana();
+        getWallet();
         changeNetwork("devnet");
       }
     } catch (error) {
@@ -86,12 +79,8 @@ export const Solana = (props: any) => {
   }, []);
 
   useEffect(() => {
-    if (!wallet || !providerSolana) setupSolana();
-  }, [connection, wallet, providerSolana]);
-
-  useEffect(() => {
-    if (publicKey === "" && getSolanaAddress) getSolanaAddress();
-  }, [connection]);
+    if (!wallet || !provider) getWallet();
+  }, [connection, wallet, provider]);
 
   const login = async () => {
     if (!web3auth) {
@@ -111,101 +100,47 @@ export const Solana = (props: any) => {
     }
     await web3auth.logout();
     setProvider(null);
-    setProviderSolana(null);
     setViewWallet(false);
     toast.success("Logged out!");
   };
 
-  const getSolanaAddress = async () => {
-    if (!provider) {
+  const getWallet = async () => {
+    if (!web3auth?.provider) {
       console.error("provider not initialized yet");
       return;
     }
-    const rpc = new RPC(provider);
-    const privateKey = await rpc.getPrivateKey();
-    const { getED25519Key } = await import("@toruslabs/openlogin-ed25519");
-    const ed25519key = getED25519Key(privateKey).sk.toString("hex");
-    const solanaPrivateKeyProvider = new SolanaPrivateKeyProvider({
-      config: {
-        chainConfig: {
-          chainId: isMainnet ? "0x3" : "0x1",
-          //rpcTarget: "https://rpc.ankr.com/solana",
-          rpcTarget:
-            isMainnet && process.env.REACT_APP_SOLANA_RPC_MAINNET != null
-              ? process.env.REACT_APP_SOLANA_RPC_MAINNET
-              : process.env.REACT_APP_SOLANA_RPC || "",
-          displayName: "Solana Mainnet",
-          blockExplorer: "https://explorer.solana.com/",
-          ticker: "SOL",
-          tickerName: "Solana",
-        },
-      },
-    });
-    await solanaPrivateKeyProvider.setupProvider(ed25519key);
-    setProviderSolana(solanaPrivateKeyProvider.provider);
-    const solanaWallet = new SolanaWallet(
-      solanaPrivateKeyProvider.provider as any
-    );
-    const solana_address = await solanaWallet.requestAccounts();
-    setPublicKey(solana_address[0]);
-    const wallet = {
-      signTransaction: (transaction: Transaction) => {
-        return solanaWallet.signTransaction(transaction);
-      },
-      signAllTransactions: (transactions: any) => {
-        return solanaWallet.signAllTransactions(transactions);
-      },
-      publicKey: new PublicKey(solana_address[0]),
-    };
+    const rpc = new RPC(web3auth?.provider);
+    const wallet = await rpc.getWallet();
     setWallet(wallet);
-    return;
-  };
 
-  const setupSolana = async () => {
-    if (!web3auth?.provider) return;
-    setProviderSolana(web3auth?.provider);
-    const solanaWallet = new SolanaWallet(web3auth.provider);
-    const solana_address = await solanaWallet.requestAccounts();
-    setPublicKey(solana_address[0]);
-    const wallet = {
-      signTransaction: (transaction: Transaction) => {
-        return solanaWallet.signTransaction(transaction);
-      },
-      signAllTransactions: (transactions: any) => {
-        return solanaWallet.signAllTransactions(transactions);
-      },
-      publicKey: new PublicKey(solana_address[0]),
-    };
-    setWallet(wallet);
+    const publicKey = await rpc.getAccounts();
+    setPublicKey(publicKey[0]);
   };
 
   const changeNetwork = async (network: string) => {
-    if (
-      network.toLowerCase() === "devnet" &&
-      process.env.REACT_APP_SOLANA_RPC
-    ) {
-      const connection = new Connection(process.env.REACT_APP_SOLANA_RPC || "");
-      setConnection(connection);
-      setNetwork(process.env.REACT_APP_SOLANA_RPC);
-    } else if (
-      network.toLowerCase() === "mainnet" &&
-      process.env.REACT_APP_SOLANA_RPC_MAINNET
-    ) {
-      const connection = new Connection(
-        process.env.REACT_APP_SOLANA_RPC_MAINNET || ""
+    const isMainnet = network === "mainnet";
+    var connection;
+    if (!isMainnet) {
+      connection = new Connection(
+        process.env.REACT_APP_SOLANA_RPC || "https://rpc.ankr.com/solana"
       );
-      setConnection(connection);
-      setNetwork(process.env.REACT_APP_SOLANA_RPC_MAINNET);
+    } else if (isMainnet) {
+      connection = new Connection(
+        process.env.REACT_APP_SOLANA_RPC_MAINNET ||
+          "https://rpc.ankr.com/solana"
+      );
     }
+    setConnection(connection || null);
+    setIsMainnet(isMainnet);
   };
 
   const sendTransaction = async (transaction: Transaction): Promise<string> => {
     try {
-      if (!providerSolana) {
+      if (!provider) {
         console.error("provider not initialized yet");
         return "";
       }
-      const solanaWallet = new SolanaWallet(providerSolana);
+      const solanaWallet = new SolanaWallet(provider);
       transaction = await solanaWallet.signTransaction(transaction);
       if (connection) {
         const signature = await connection.sendRawTransaction(
@@ -223,11 +158,10 @@ export const Solana = (props: any) => {
     <>
       <img alt="solana" src="./assets/solana.svg" className="chain-container" />
       <Box className="join-container">
-        {providerSolana && viewWallet && connection ? (
+        {provider && viewWallet && connection ? (
           <WalletSolana
             publicKey={publicKey}
-            provider={providerSolana}
-            network={network}
+            provider={provider}
             changeNetwork={changeNetwork}
             isMainnet={isMainnet}
             sendTransaction={sendTransaction}
@@ -235,7 +169,7 @@ export const Solana = (props: any) => {
             wallet={wallet}
             logout={logout}
           />
-        ) : providerSolana && connection != null ? (
+        ) : provider && connection != null ? (
           <Join
             publicKey={publicKey}
             wallet={wallet}
@@ -253,15 +187,9 @@ export const Solana = (props: any) => {
 
       {provider && (
         <Box sx={{ mt: 3 }}>
-          {viewWallet ? (
-            <IconButton onClick={() => setViewWallet(!viewWallet)}>
-              <ArrowBackIcon />
-            </IconButton>
-          ) : (
-            <IconButton onClick={() => setViewWallet(!viewWallet)}>
-              <WalletIcon />
-            </IconButton>
-          )}
+          <IconButton onClick={() => setViewWallet(!viewWallet)}>
+            <WalletIcon />
+          </IconButton>
         </Box>
       )}
     </>

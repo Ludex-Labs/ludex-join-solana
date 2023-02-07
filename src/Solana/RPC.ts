@@ -30,10 +30,9 @@ export class RPC {
     }
   };
 
-  getBalance = async (network: string): Promise<string> => {
+  getBalance = async (connection: Connection): Promise<string> => {
     try {
       const solanaWallet = new SolanaWallet(this.provider);
-      const connection = new Connection(network);
       const accounts = await solanaWallet.requestAccounts();
       const balance = await connection.getBalance(new PublicKey(accounts[0]));
       return balance.toString();
@@ -127,12 +126,11 @@ export const getTestSol = async (publicKey: string) => {
 export const viewTokenAccounts = async (
   provider: SafeEventEmitterProvider,
   publicKey: string,
-  network: string
+  connection: Connection
 ) => {
   try {
     if (provider === null) return;
     const _publicKey = new PublicKey(publicKey);
-    const connection = new Connection(network);
     let tokenAccounts = await connection.getParsedTokenAccountsByOwner(
       _publicKey,
       {
@@ -150,7 +148,7 @@ export const viewTokenAccounts = async (
 export const importToken = async (
   provider: SafeEventEmitterProvider,
   publicKey: string,
-  network: string,
+  connection: Connection,
   tokenToImport: string
 ) => {
   try {
@@ -159,7 +157,6 @@ export const importToken = async (
     const mintPubkey = new PublicKey(tokenToImport);
     const _publicKey = new PublicKey(publicKey);
     let ata = await getAssociatedTokenAddress(mintPubkey, _publicKey);
-    const connection = new Connection(network);
     // eslint-disable-next-line prefer-destructuring
     const blockhash = (await connection.getLatestBlockhash()).blockhash;
     const tx = new Transaction().add(
@@ -179,7 +176,7 @@ export const importToken = async (
     console.log("signature", signature);
     toast.success("Import token success!");
     //setMint("");
-    viewTokenAccounts(provider, publicKey, network);
+    viewTokenAccounts(provider, publicKey, connection);
   } catch (error) {
     console.error(error);
   }
