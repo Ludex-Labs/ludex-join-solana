@@ -66,6 +66,8 @@ export const Join: FC<{
       }
       return "";
     } catch (error) {
+      console.error(error);
+      console.error((error as any)?.logs);
       return error as string;
     }
   };

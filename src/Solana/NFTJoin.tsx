@@ -172,12 +172,14 @@ export const NFTJoin: FC<{
       const result = await connection.getLatestBlockhash();
       tx.recentBlockhash = result.blockhash;
       tx.feePayer = new PublicKey(publicKey);
-      if (sendTransaction) await sendTransaction(tx);
+      if (!sendTransaction) return;
+      const res = await sendTransaction(tx);
+      if (res.toString().includes("Error")) throw new Error(res);
+      else toast.success("Offering added!");
       setIsLoading(false);
       setOpen(false);
       getOfferings();
     } catch (e) {
-      console.error(e);
       toast.error("Error adding offering.");
       setIsLoading(false);
     }
@@ -202,7 +204,7 @@ export const NFTJoin: FC<{
       if (sendTransaction) {
         const res = await sendTransaction(tx);
         if (res.toString().includes("Error")) throw new Error(res);
-        toast.success("Offering removing");
+        toast.success("Offering removing!");
         setOpenOffering(false);
       }
       setIsLoading(false);
@@ -232,7 +234,7 @@ export const NFTJoin: FC<{
       if (!signature.toString().includes("Error")) {
         setIsLoading(false);
         setAccepted(true);
-        toast.success("Offering accepted");
+        toast.success("Offering accepted!");
       } else throw new Error(signature);
       setIsLoading(false);
     } catch (e) {
