@@ -2,6 +2,7 @@
   "name": "ludex-join-solana",
   "version": "1.4.0",
   "private": true,
+  "homepage": "/ludex-join-solana",
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
