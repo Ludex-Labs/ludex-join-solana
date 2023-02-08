@@ -180,7 +180,7 @@ export const Join: FC<{
           fullWidth
           variant="contained"
           size="large"
-          disabled={isLoading || challengeAddress.length > 35 || joined}
+          disabled={isLoading || challengeAddress.length < 35 || joined}
           sx={{ mt: 1 }}
           onClick={() => joinFTChallenge()}
         >
