@@ -1,20 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
-import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
-import { Join } from "./Join";
-import { WalletSolana } from "./WalletSolana";
-import { Connection } from "@solana/web3.js";
-import { RPC } from "./RPC";
+import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 
-// Web3Auth
-import { Web3Auth } from "@web3auth/modal";
-import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
-import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
-
+import { Wallet } from '@ludex-labs/ludex-sdk-js/lib/web3/utils';
 // MUI
-import WalletIcon from "@mui/icons-material/Wallet";
-import { Button, IconButton } from "@mui/material";
+import WalletIcon from '@mui/icons-material/Wallet';
+import { Button, IconButton } from '@mui/material';
+import { Connection } from '@solana/web3.js';
+import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from '@web3auth/base';
+// Web3Auth
+import { Web3Auth } from '@web3auth/modal';
+import { OpenloginAdapter } from '@web3auth/openlogin-adapter';
+
+import { Join } from './Join';
+import { RPC } from './RPC';
+import { WalletSolana } from './WalletSolana';
 
 export const Solana = () => {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
@@ -32,11 +32,22 @@ export const Solana = () => {
     rpcTarget:
       isMainnet && process.env.REACT_APP_SOLANA_RPC_MAINNET != null
         ? process.env.REACT_APP_SOLANA_RPC_MAINNET
-        : process.env.REACT_APP_SOLANA_RPC || "https://rpc.ankr.com/solana",
+        : process.env.REACT_APP_SOLANA_RPC ||
+          "https://api.mainnet-beta.solana.com",
     displayName: "Solana Mainnet",
     blockExplorer: "https://explorer.solana.com/",
     ticker: "SOL",
     tickerName: "Solana",
+  };
+
+  const getWallet = async () => {
+    if (!web3auth?.provider) {
+      console.error("provider not initialized yet");
+      return;
+    }
+    const rpc = new RPC(web3auth?.provider);
+    const wallet = await rpc.getWallet();
+    setWallet(wallet);
   };
 
   const initWeb3Auth = async () => {
@@ -78,13 +89,24 @@ export const Solana = () => {
     if (!wallet || !provider) getWallet();
   }, [connection, wallet, provider]);
 
+  const changeNetwork = async (network: string) => {
+    const isMainnet = network === "mainnet";
+    var connection = new Connection(
+      isMainnet && process.env.REACT_APP_SOLANA_RPC_MAINNET != null
+        ? process.env.REACT_APP_SOLANA_RPC_MAINNET
+        : process.env.REACT_APP_SOLANA_RPC || "https://rpc.ankr.com/solana"
+    );
+    setConnection(connection || null);
+    setIsMainnet(isMainnet);
+  };
+
   const login = async () => {
     if (!web3auth) {
       console.error("web3auth not initialized yet");
       return;
     }
     const web3authProvider = await web3auth.connect();
-    await setProvider(web3authProvider);
+    setProvider(web3authProvider);
     await changeNetwork("devnet");
     toast.success("Logged in Successfully!");
   };
@@ -98,27 +120,6 @@ export const Solana = () => {
     setProvider(null);
     setViewWallet(false);
     toast.success("Logged out!");
-  };
-
-  const getWallet = async () => {
-    if (!web3auth?.provider) {
-      console.error("provider not initialized yet");
-      return;
-    }
-    const rpc = new RPC(web3auth?.provider);
-    const wallet = await rpc.getWallet();
-    setWallet(wallet);
-  };
-
-  const changeNetwork = async (network: string) => {
-    const isMainnet = network === "mainnet";
-    var connection = new Connection(
-      isMainnet && process.env.REACT_APP_SOLANA_RPC_MAINNET != null
-        ? process.env.REACT_APP_SOLANA_RPC_MAINNET
-        : process.env.REACT_APP_SOLANA_RPC || "https://rpc.ankr.com/solana"
-    );
-    setConnection(connection || null);
-    setIsMainnet(isMainnet);
   };
 
   return (

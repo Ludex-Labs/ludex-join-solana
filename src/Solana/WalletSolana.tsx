@@ -1,32 +1,24 @@
+import BN from 'bn.js';
 /* eslint-disable react-hooks/exhaustive-deps */
-import { FC, useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
-import { NFTMint } from "./NFTMint";
-import { Connection } from "@solana/web3.js";
-import { SafeEventEmitterProvider } from "@web3auth/base";
-import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
-import { RPC, getTestSol, viewTokenAccounts, importToken } from "./RPC";
+import { FC, useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 
+import { Wallet } from '@ludex-labs/ludex-sdk-js/lib/web3/utils';
+import CloseIcon from '@mui/icons-material/Close';
+import NotesIcon from '@mui/icons-material/Notes';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import SendIcon from '@mui/icons-material/Send';
+import UploadIcon from '@mui/icons-material/Upload';
 // MUI
 import {
-  Box,
-  IconButton,
-  Button,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-  InputAdornment,
-  Typography,
-  Dialog,
-  DialogTitle,
-  MenuItem,
-  Select,
-} from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import SendIcon from "@mui/icons-material/Send";
-import NotesIcon from "@mui/icons-material/Notes";
-import UploadIcon from "@mui/icons-material/Upload";
-import CloseIcon from "@mui/icons-material/Close";
+  Box, Button, Dialog, DialogTitle, FormControl, IconButton, InputAdornment, InputLabel, MenuItem,
+  OutlinedInput, Select, Typography
+} from '@mui/material';
+import { Connection, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { SafeEventEmitterProvider } from '@web3auth/base';
+
+import { NFTMint } from './NFTMint';
+import { getTestSol, importToken, RPC, viewTokenAccounts } from './RPC';
 
 export const WalletSolana: FC<{
   provider: SafeEventEmitterProvider | null;
@@ -46,15 +38,10 @@ export const WalletSolana: FC<{
     changeNetwork,
     logout,
   } = props;
-  const [balanceFetched, setBalanceFetched] = useState(false);
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState<string | undefined>(undefined);
   const [openMint, setOpenMint] = useState(false);
   const [openImportToken, setOpenImportToken] = useState(false);
   const [tokenToImport, setTokenToImport] = useState("");
-
-  useEffect(() => {
-    getBalance();
-  }, []);
 
   const getBalance = async () => {
     if (!provider) {
@@ -63,9 +50,12 @@ export const WalletSolana: FC<{
     }
     const rpc = new RPC(provider);
     const balance = await rpc.getBalance(connection);
-    setBalance(parseInt(balance));
-    setBalanceFetched(true);
+    setBalance(balance);
   };
+
+  useEffect(() => {
+    getBalance();
+  }, []);
 
   return (
     <>
@@ -102,14 +92,17 @@ export const WalletSolana: FC<{
       <FormControl fullWidth sx={{ width: "100%", mb: 2 }}>
         <InputLabel>Balance</InputLabel>
         <OutlinedInput
-          value={balance / 1000000000 + " SOL"}
+          value={
+            new BN(balance || "0").sub(new BN(LAMPORTS_PER_SOL)).toString() +
+            " SOL"
+          }
           label="Wallet"
           disabled
           endAdornment={
             <InputAdornment position="end">
               <Button
                 variant="contained"
-                disabled={balanceFetched}
+                disabled={balance === undefined}
                 onClick={() => {
                   getBalance();
                 }}
