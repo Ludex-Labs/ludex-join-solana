@@ -1,37 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { FC, useEffect, useState } from "react";
-import { Metaplex, guestIdentity } from "@metaplex-foundation/js";
-import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
-import { toast } from "react-hot-toast";
-import { NFTChallenge } from "@ludex-labs/ludex-sdk-js";
-import {
-  Connection,
-  PublicKey,
-  Transaction,
-  LAMPORTS_PER_SOL,
-} from "@solana/web3.js";
+import { FC, useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 
+import { NFTChallenge } from '@ludex-labs/ludex-sdk-js';
+import { Wallet } from '@ludex-labs/ludex-sdk-js/lib/web3/utils';
+import { guestIdentity, Metaplex } from '@metaplex-foundation/js';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import DescriptionIcon from '@mui/icons-material/Description';
+import RefreshIcon from '@mui/icons-material/Refresh';
 // MUI
 import {
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  Dialog,
-  DialogTitle,
-  TextField,
-  Typography,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  OutlinedInput,
-  InputAdornment,
-  IconButton,
-} from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import DescriptionIcon from "@mui/icons-material/Description";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+  Box, Button, Checkbox, Dialog, DialogTitle, FormControl, FormControlLabel, FormGroup, IconButton,
+  InputAdornment, InputLabel, OutlinedInput, Select, TextField, Typography
+} from '@mui/material';
+import { Connection, LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js';
 
 export const NFTJoin: FC<{
   publicKey: string;
@@ -117,12 +99,6 @@ export const NFTJoin: FC<{
       });
   };
 
-  useEffect(() => {
-    if (challengeAddress.length === 44) {
-      getOfferings();
-    }
-  }, [challengeAddress, wallet]);
-
   const getOfferings = async () => {
     try {
       if (!wallet) return;
@@ -152,6 +128,12 @@ export const NFTJoin: FC<{
       toast.error("Error getting offerings.");
     }
   };
+
+  useEffect(() => {
+    if (challengeAddress.length === 44) {
+      getOfferings();
+    }
+  }, [challengeAddress, wallet]);
 
   const onClickAddOffering = async (type: string) => {
     setIsLoading(true);
