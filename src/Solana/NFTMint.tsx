@@ -39,10 +39,8 @@ export const NFTMint: FC<{
                 symbol: "MNFT",
                 sellerFeeBasisPoints: 10,
                 uri: "https://arweave.net/VuAKyW8PhDI2YbHuKzB1tS-gFWvbSLUkytrDq0A8TNY",
-                // payer: fromWallet,
                 tokenOwner: pk,
               });
-              // .run();
 
               console.info("NFT: ", nft);
               setIsLoading(false);

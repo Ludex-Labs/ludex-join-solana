@@ -139,7 +139,6 @@ export const viewTokenAccounts = async (
     );
     toast.success("Token Accounts logged in console!");
     console.log("tokenAccounts", tokenAccounts);
-    //setTokenAccounts(tokenAccounts?.value);
   } catch (error) {
     console.error(error);
   }
@@ -175,7 +174,6 @@ export const importToken = async (
     );
     console.log("signature", signature);
     toast.success("Import token success!");
-    //setMint("");
     viewTokenAccounts(provider, publicKey, connection);
   } catch (error) {
     console.error(error);

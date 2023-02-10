@@ -75,39 +75,30 @@ export const Join: FC<{
   const joinFTChallenge = async () => {
     if (!wallet || !sendTransaction) return;
     setIsLoading(true);
-    const ludexTx = new Challenge.ChallengeTXClient(
-      connection,
-      challengeAddress,
-      {
-        wallet: wallet,
-        cluster: isMainnet ? "MAINNET" : "DEVNET",
-      }
-    );
-    ludexTx
-      .join(wallet.publicKey.toBase58())
-      .getTx()
-      .then((tx) => {
-        connection
-          .getLatestBlockhash() //.getRecentBlockhash()
-          .then((result) => {
-            tx.recentBlockhash = result.blockhash;
-            if (!sendTransaction)
-              throw new Error("Failed to send transaction.");
-            return sendTransaction(tx);
-          })
-          .then((signature) => {
-            if (!signature.toString().includes("Error")) {
-              setJoined(true);
-              setIsLoading(false);
-              toast.success("FT Challenge joined!");
-            } else throw new Error(signature);
-          })
-          .catch((e) => {
-            console.error(e);
-            toast.error("Failed to join challenge.");
-            setIsLoading(false);
-          });
-      });
+    try {
+      const ludexTx = new Challenge.ChallengeTXClient(
+        connection,
+        challengeAddress,
+        {
+          wallet: wallet,
+          cluster: isMainnet ? "MAINNET" : "DEVNET",
+        }
+      );
+      const tx = await ludexTx.join(wallet.publicKey.toBase58()).getTx();
+      const result = connection.getLatestBlockhash();
+      tx.recentBlockhash = (await result).blockhash;
+      if (!sendTransaction) throw new Error("Failed to send transaction.");
+      const signature = await sendTransaction(tx);
+      if (!signature.toString().includes("Error")) {
+        setJoined(true);
+        setIsLoading(false);
+        toast.success("FT Challenge joined!");
+      } else throw new Error(signature);
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to join challenge.");
+      setIsLoading(false);
+    }
   };
 
   return (
