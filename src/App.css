@@ -88,3 +88,7 @@ a {
   background: #374151;
   border-radius: 32px;
 }
+
+.MuiNativeSelect-select {
+  overflow: auto;
+}

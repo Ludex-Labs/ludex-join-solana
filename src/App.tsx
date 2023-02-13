@@ -157,7 +157,7 @@ function App() {
               changeNetwork={changeNetwork}
             />
           ) : (
-            <Button variant={"contained"} onClick={() => login()}>
+            <Button variant={"contained"} size="large" onClick={() => login()}>
               Sign In
             </Button>
           )}

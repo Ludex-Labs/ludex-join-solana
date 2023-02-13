@@ -33,6 +33,18 @@ import {
   Transaction,
 } from "@solana/web3.js";
 
+interface Offering {
+  account: {
+    player: PublicKey;
+    tokenAccount: PublicKey | null;
+    mint: PublicKey | null;
+    isEscrowed: boolean;
+    amount: any;
+  };
+  authority: PublicKey | undefined;
+  publicKey: PublicKey;
+}
+
 export const NFTJoin: FC<{
   publicKey: string;
   wallet?: Wallet;
@@ -117,7 +129,8 @@ export const NFTJoin: FC<{
         challengeAddress,
         wallet
       );
-      const offerings = _offerings.map((offering: any) => {
+
+      const offerings = _offerings.map((offering: Offering) => {
         return {
           name: offering?.account?.mint
             ? "NFT - " + offering?.account?.mint?.toBase58()
@@ -132,6 +145,7 @@ export const NFTJoin: FC<{
           authority: offering?.authority ? offering?.authority?.toBase58() : "",
         };
       });
+
       setOfferings(offerings);
     } catch (e) {
       console.error(e);
@@ -281,7 +295,11 @@ export const NFTJoin: FC<{
           label="Native"
           disabled={isLoading || challengeAddress.length !== 44}
           value={[selectedOffering]}
-          sx={{ borderBottomRightRadius: 0, borderBottomLeftRadius: 0 }}
+          sx={{
+            borderBottomRightRadius: 0,
+            borderBottomLeftRadius: 0,
+            overflow: "auto",
+          }}
         >
           {offerings.length > 0 ? (
             offerings.map((offering: any, i: number) => {
