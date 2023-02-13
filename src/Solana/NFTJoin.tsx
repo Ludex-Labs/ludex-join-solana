@@ -45,6 +45,17 @@ interface Offering {
   publicKey: PublicKey;
 }
 
+interface DeserialziedOffering {
+  name: string;
+  amount: number;
+  isEscrowed: boolean;
+  mint: string | null;
+  _mint: PublicKey | null;
+  publicKey: string;
+  authority: string;
+  metadata: any;
+}
+
 export const NFTJoin: FC<{
   publicKey: string;
   wallet?: Wallet;
@@ -68,8 +79,9 @@ export const NFTJoin: FC<{
   const [open, setOpen] = useState<boolean>(false);
   const [NFTmint, setNFTmint] = useState<string>("");
   const [amount, setAmount] = useState<number>(0.001);
-  const [selectedOffering, setSelectedOffering] = useState<any>([1]);
-  const [offerings, setOfferings] = useState<any>([]);
+  const [selectedOffering, setSelectedOffering] =
+    useState<DeserialziedOffering | null>(null);
+  const [offerings, setOfferings] = useState<DeserialziedOffering[]>([]);
   const [openOffering, setOpenOffering] = useState<boolean>(false);
   const [accepted, setAccepted] = useState<boolean>(false);
   const [playerStatus, setPlayerStatus] = useState<string>("");
@@ -81,7 +93,7 @@ export const NFTJoin: FC<{
 
   const getPlayerStatus = async () => {
     if (!wallet) return;
-    // "NOT_IN_GAME" | "ACCEPTED" | "JOINED"
+    // Possible Statuses: "NOT_IN_GAME" | "ACCEPTED" | "JOINED"
     var playerStatus = await NFTChallenge.NftChallengeTXClient.getPlayerStatus(
       connection,
       wallet?.publicKey,
@@ -132,17 +144,18 @@ export const NFTJoin: FC<{
 
       const offerings = _offerings.map((offering: Offering) => {
         return {
-          name: offering?.account?.mint
-            ? "NFT - " + offering?.account?.mint?.toBase58()
-            : offering?.account?.amount?.toNumber() / LAMPORTS_PER_SOL + " SOL",
           amount: offering?.account?.amount?.toNumber() / LAMPORTS_PER_SOL,
           isEscrowed: offering?.account.isEscrowed,
+          publicKey: offering?.publicKey?.toBase58(),
+          authority: offering?.authority ? offering?.authority?.toBase58() : "",
+          metadata: null,
+          _mint: offering?.account?.mint ? offering?.account?.mint : null,
           mint: offering?.account?.mint
             ? offering?.account?.mint?.toBase58()
             : null,
-          _mint: offering?.account?.mint ? offering?.account?.mint : null,
-          publicKey: offering?.publicKey?.toBase58(),
-          authority: offering?.authority ? offering?.authority?.toBase58() : "",
+          name: offering?.account?.mint
+            ? "NFT - " + offering?.account?.mint?.toBase58()
+            : offering?.account?.amount?.toNumber() / LAMPORTS_PER_SOL + " SOL",
         };
       });
 
@@ -201,6 +214,7 @@ export const NFTJoin: FC<{
           wallet: wallet,
         }
       );
+      if (!selectedOffering?.publicKey) return;
       var tx = await ludexTx
         .removeOffering(publicKey, selectedOffering?.publicKey)
         .getTx();
@@ -571,7 +585,6 @@ export const NFTJoin: FC<{
               onClick={() => onClickRemoveOffering()}
               disabled={
                 isLoading ||
-                selectedOffering.length === 0 ||
                 selectedOffering?.authority !== wallet?.publicKey?.toBase58()
               }
             >
