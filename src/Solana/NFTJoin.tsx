@@ -1,19 +1,37 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { FC, useEffect, useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { FC, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
-import { NFTChallenge } from '@ludex-labs/ludex-sdk-js';
-import { Wallet } from '@ludex-labs/ludex-sdk-js/lib/web3/utils';
-import { guestIdentity, Metaplex } from '@metaplex-foundation/js';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import DescriptionIcon from '@mui/icons-material/Description';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { NFTChallenge } from "@ludex-labs/ludex-sdk-js";
+import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
+import { guestIdentity, Metaplex } from "@metaplex-foundation/js";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import DescriptionIcon from "@mui/icons-material/Description";
+import RefreshIcon from "@mui/icons-material/Refresh";
 // MUI
 import {
-  Box, Button, Checkbox, Dialog, DialogTitle, FormControl, FormControlLabel, FormGroup, IconButton,
-  InputAdornment, InputLabel, OutlinedInput, Select, TextField, Typography
-} from '@mui/material';
-import { Connection, LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js';
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogTitle,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+  Select,
+  TextField,
+  Typography,
+} from "@mui/material";
+import {
+  Connection,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  Transaction,
+} from "@solana/web3.js";
 
 export const NFTJoin: FC<{
   publicKey: string;
@@ -342,7 +360,7 @@ export const NFTJoin: FC<{
       </Button>
 
       <Dialog
-        className="dark-dialog"
+        className="dark-dialog-slim"
         onClose={() => setOpen(false)}
         open={open}
       >
@@ -362,7 +380,8 @@ export const NFTJoin: FC<{
               justifyContent: "center",
               alignItems: "center",
               flexDirection: "column",
-              padding: "0 20px",
+              padding: "0 24px",
+              paddingBottom: "16px",
             }}
           >
             <TextField

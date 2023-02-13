@@ -1,35 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 
-/* Thinner Scroll Bar */
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: #2a2d2f;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #ffffff;
-  border-radius: 10px;
-  cursor: grabbing;
-  cursor: -moz-grabbing;
-  cursor: -webkit-grabbing;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #ffffff;
-  border-radius: 15px;
-  cursor: grabbing;
-  cursor: -moz-grabbing;
-  cursor: -webkit-grabbing;
-}
-
 body {
   color: #fff;
   font-family: Rubik, Inter, sans-serif;
@@ -64,8 +35,6 @@ a {
 }
 
 .join-container {
-  /* box-shadow: 0 4px 16px 0 rgba(193, 193, 193, 0.37); */
-  /* border: 1px solid rgba(255, 255, 255, 0.18); */
   background: #374151;
   border-radius: 32px;
   padding: 30px;
@@ -109,4 +78,13 @@ a {
   border-radius: 32px;
   padding: 30px;
   padding-top: 15px;
+}
+
+.dark-dialog-slim .MuiBackdrop-root {
+  background-color: rgba(0, 0, 0, 0.9) !important;
+}
+
+.dark-dialog-slim .MuiPaper-root {
+  background: #374151;
+  border-radius: 32px;
 }

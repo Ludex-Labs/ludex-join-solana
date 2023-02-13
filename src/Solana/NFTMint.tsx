@@ -35,10 +35,10 @@ export const NFTMint: FC<{
               metaplex.use(walletAdapterIdentity(wallet));
               const pk = new PublicKey(publicKey);
               const nft = await metaplex.nfts().create({
-                name: "My NFT",
-                symbol: "MNFT",
+                name: name,
+                symbol: symbol,
                 sellerFeeBasisPoints: 10,
-                uri: "https://arweave.net/VuAKyW8PhDI2YbHuKzB1tS-gFWvbSLUkytrDq0A8TNY",
+                uri: uri,
                 tokenOwner: pk,
               });
 
@@ -68,7 +68,7 @@ export const NFTMint: FC<{
       onClose={() => setOpenMint(false)}
       open={openMint}
     >
-      <Box>
+      <Box sx={{ minWidth: "300px" }}>
         <DialogTitle> Mint Test NFT</DialogTitle>
         <Box
           sx={{
