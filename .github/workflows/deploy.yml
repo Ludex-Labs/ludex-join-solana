@@ -4,7 +4,7 @@ name: Deploy static content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["main"]
+    branches: ["master"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -38,12 +38,14 @@ jobs:
         run: |
           npm ci
           npm run build
+        env: 
+          REACT_APP_SOLANA_RPC: ${{ vars.REACT_APP_SOLANA_RPC }}
+          REACT_APP_SOLANA_RPC_MAINNET: ${{ vars.REACT_APP_SOLANA_RPC_MAINNET }}
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          # Upload entire repository
           path: 'build'
       - name: Deploy to GitHub Pages
         id: deployment
