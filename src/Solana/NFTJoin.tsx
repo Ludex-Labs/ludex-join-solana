@@ -110,10 +110,7 @@ export const NFTJoin: FC<{
     try {
       const ludexTx = new NFTChallenge.NftChallengeTXClient(
         connection,
-        challengeAddress,
-        {
-          wallet: wallet,
-        }
+        challengeAddress
       );
       const tx = await ludexTx.join(wallet.publicKey.toBase58()).getTx();
       const result = connection.getLatestBlockhash();
@@ -177,10 +174,7 @@ export const NFTJoin: FC<{
     try {
       const ludexTx = new NFTChallenge.NftChallengeTXClient(
         connection,
-        challengeAddress,
-        {
-          wallet: wallet,
-        }
+        challengeAddress
       );
       var tx: Transaction | undefined;
       if (type === "SOL") {
@@ -209,10 +203,7 @@ export const NFTJoin: FC<{
     try {
       const ludexTx = new NFTChallenge.NftChallengeTXClient(
         connection,
-        challengeAddress,
-        {
-          wallet: wallet,
-        }
+        challengeAddress
       );
       if (!selectedOffering?.publicKey) return;
       var tx = await ludexTx
@@ -240,10 +231,7 @@ export const NFTJoin: FC<{
     try {
       const ludexTx = new NFTChallenge.NftChallengeTXClient(
         connection,
-        challengeAddress,
-        {
-          wallet: wallet,
-        }
+        challengeAddress
       );
       var tx = await ludexTx.accept(publicKey).getTx();
       const result = await connection.getLatestBlockhash();
