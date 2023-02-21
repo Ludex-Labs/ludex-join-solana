@@ -159,7 +159,6 @@ function App() {
           ) : (
             <Button
               className="btn-login"
-              // sx={{ fontFamily: "Rubik", boxShadow: "#ff714f3d !important" }}
               variant={"contained"}
               size="large"
               onClick={() => login()}
@@ -170,9 +169,33 @@ function App() {
         </span>
 
         {provider && (
-          <IconButton onClick={() => setViewWallet(!viewWallet)} sx={{ mt: 2 }}>
-            <WalletIcon />
-          </IconButton>
+          // <IconButton sx={{ mt: 2 }}>
+          <Button
+            sx={{
+              backgroundColor: "#ff714f",
+              display: "flex",
+              alignItems: "center",
+              padding: "10px",
+              borderRadius: "10px",
+              marginTop: "1rem",
+            }}
+            onClick={() => setViewWallet(!viewWallet)}
+          >
+            <WalletIcon sx={{ width: "30px", height: "30px" }} />
+            <>
+              <Box
+                sx={{
+                  fontFamily: "Rubik",
+                  ml: "5px",
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                }}
+              >
+                Wallet
+              </Box>
+            </>
+          </Button>
+          // </IconButton>
         )}
       </Box>
     </Box>

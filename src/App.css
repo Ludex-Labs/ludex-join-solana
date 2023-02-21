@@ -32,6 +32,10 @@ a {
 .container-page {
   z-index: 1;
   max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 #w3a-modal {
@@ -101,6 +105,7 @@ a {
   font-family: Rubik, Inter, sans-serif !important;
   box-shadow: #ff714f3d 0px 8px 16px 0px !important;
   border-radius: 8px !important;
+  text-transform: none !important;
 }
 
 .join-button:disabled {
