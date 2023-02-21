@@ -168,6 +168,7 @@ export const Join: FC<{
 
       {type === "FT" ? (
         <Button
+          className="join-button"
           fullWidth
           variant="contained"
           size="large"

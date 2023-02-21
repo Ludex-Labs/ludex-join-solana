@@ -102,3 +102,7 @@ a {
   box-shadow: #ff714f3d 0px 8px 16px 0px !important;
   border-radius: 8px !important;
 }
+
+.join-button:disabled {
+  box-shadow: none !important;
+}
