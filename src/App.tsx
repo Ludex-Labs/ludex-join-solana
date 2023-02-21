@@ -157,7 +157,13 @@ function App() {
               changeNetwork={changeNetwork}
             />
           ) : (
-            <Button variant={"contained"} size="large" onClick={() => login()}>
+            <Button
+              className="btn-login"
+              // sx={{ fontFamily: "Rubik", boxShadow: "#ff714f3d !important" }}
+              variant={"contained"}
+              size="large"
+              onClick={() => login()}
+            >
               Sign In
             </Button>
           )}

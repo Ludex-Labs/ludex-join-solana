@@ -3,7 +3,7 @@
 
 body {
   color: #fff;
-  font-family: Rubik, Inter, sans-serif;
+  font-family: Rubik, Inter, sans-serif !important;
 }
 
 a {
@@ -91,4 +91,10 @@ a {
 
 .MuiNativeSelect-select {
   overflow: auto;
+}
+
+.btn-login {
+  font-family: Rubik, Inter, sans-serif !important;
+  box-shadow: #ff714f3d 0px 8px 16px 0px !important;
+  border-radius: 8px !important;
 }
