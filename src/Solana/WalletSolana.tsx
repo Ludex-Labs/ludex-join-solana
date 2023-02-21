@@ -26,6 +26,18 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import SendIcon from "@mui/icons-material/Send";
 import UploadIcon from "@mui/icons-material/Upload";
 
+// Button Style
+const buttonStyles = {
+  margin: 1,
+  textTransform: "none",
+  fontFamily: "Rubik",
+  boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+  borderRadius: "8px !important",
+  "&:hover": {
+    boxShadow: "none !important",
+  },
+};
+
 export const WalletSolana: FC<{
   provider: SafeEventEmitterProvider | null;
   publicKey: string;
@@ -149,14 +161,7 @@ export const WalletSolana: FC<{
               );
             }}
             sx={{
-              margin: 1,
-              textTransform: "none",
-              fontFamily: "Rubik",
-              boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
-              borderRadius: "8px !important",
-              "&:hover": {
-                boxShadow: "none !important",
-              },
+              ...buttonStyles,
             }}
           >
             Top Up
@@ -167,14 +172,7 @@ export const WalletSolana: FC<{
             size="small"
             onClick={() => getTestSol(publicKey)}
             sx={{
-              margin: 1,
-              textTransform: "none",
-              fontFamily: "Rubik",
-              boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
-              borderRadius: "8px !important",
-              "&:hover": {
-                boxShadow: "none !important",
-              },
+              ...buttonStyles,
             }}
           >
             Get Test SOL
@@ -189,24 +187,10 @@ export const WalletSolana: FC<{
             openMint
               ? {
                   background: "#1a1f2e",
-                  margin: 1,
-                  textTransform: "none",
-                  fontFamily: "Rubik",
-                  boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
-                  borderRadius: "8px !important",
-                  "&:hover": {
-                    boxShadow: "none !important",
-                  },
+                  ...buttonStyles,
                 }
               : {
-                  margin: 1,
-                  textTransform: "none",
-                  fontFamily: "Rubik",
-                  boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
-                  borderRadius: "8px !important",
-                  "&:hover": {
-                    boxShadow: "none !important",
-                  },
+                  ...buttonStyles,
                 }
           }
         >
@@ -221,24 +205,10 @@ export const WalletSolana: FC<{
             openImportToken
               ? {
                   background: "#1a1f2e",
-                  margin: 1,
-                  textTransform: "none",
-                  fontFamily: "Rubik",
-                  boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
-                  borderRadius: "8px !important",
-                  "&:hover": {
-                    boxShadow: "none !important",
-                  },
+                  ...buttonStyles,
                 }
               : {
-                  margin: 1,
-                  textTransform: "none",
-                  fontFamily: "Rubik",
-                  boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
-                  borderRadius: "8px !important",
-                  "&:hover": {
-                    boxShadow: "none !important",
-                  },
+                  ...buttonStyles,
                 }
           }
         >
@@ -250,14 +220,7 @@ export const WalletSolana: FC<{
           size="small"
           onClick={() => logout()}
           sx={{
-            margin: 1,
-            textTransform: "none",
-            fontFamily: "Rubik",
-            boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
-            borderRadius: "8px !important",
-            "&:hover": {
-              boxShadow: "none !important",
-            },
+            ...buttonStyles,
           }}
         >
           Logout
