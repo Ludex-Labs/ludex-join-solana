@@ -179,7 +179,7 @@ export const Join: FC<{
             boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
             borderRadius: "8px !important",
             "&:hover": {
-              boxShadow: "none",
+              boxShadow: "none !important",
             },
           }}
           onClick={() => joinFTChallenge()}
