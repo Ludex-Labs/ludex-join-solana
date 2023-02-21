@@ -196,7 +196,7 @@ function App() {
                     textTransform: "none",
                   }}
                 >
-                  Wallet
+                  {viewWallet ? "Back" : "Wallet"}
                 </Box>
               </>
             </Button>
