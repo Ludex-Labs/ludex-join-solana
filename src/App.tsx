@@ -166,37 +166,43 @@ function App() {
               Sign In
             </Button>
           )}
+          {provider && (
+            // <IconButton sx={{ mt: 2 }}>
+            <Button
+              sx={{
+                backgroundColor: "#ff714f",
+                display: "flex",
+                alignItems: "center",
+                padding: "10px",
+                borderRadius: "10px",
+                marginTop: "1rem",
+                maxWidth: "290px",
+                height: "42.25px",
+                boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+                "&:hover": {
+                  boxShadow: "none !important",
+                },
+              }}
+              onClick={() => setViewWallet(!viewWallet)}
+            >
+              <WalletIcon sx={{ width: "30px", height: "30px" }} />
+              <>
+                <Box
+                  sx={{
+                    fontFamily: "Rubik",
+                    ml: "5px",
+                    fontSize: "1rem",
+                    fontWeight: 500,
+                    textTransform: "none",
+                  }}
+                >
+                  Wallet
+                </Box>
+              </>
+            </Button>
+            // </IconButton>
+          )}
         </span>
-
-        {provider && (
-          // <IconButton sx={{ mt: 2 }}>
-          <Button
-            sx={{
-              backgroundColor: "#ff714f",
-              display: "flex",
-              alignItems: "center",
-              padding: "10px",
-              borderRadius: "10px",
-              marginTop: "1rem",
-            }}
-            onClick={() => setViewWallet(!viewWallet)}
-          >
-            <WalletIcon sx={{ width: "30px", height: "30px" }} />
-            <>
-              <Box
-                sx={{
-                  fontFamily: "Rubik",
-                  ml: "5px",
-                  fontSize: "1rem",
-                  fontWeight: 500,
-                }}
-              >
-                Wallet
-              </Box>
-            </>
-          </Button>
-          // </IconButton>
-        )}
       </Box>
     </Box>
   );

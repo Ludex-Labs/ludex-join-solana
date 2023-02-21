@@ -148,7 +148,16 @@ export const WalletSolana: FC<{
                 "popup=true,height=600,width=400"
               );
             }}
-            style={{ margin: 5 }}
+            sx={{
+              margin: 1,
+              textTransform: "none",
+              fontFamily: "Rubik",
+              boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+              borderRadius: "8px !important",
+              "&:hover": {
+                boxShadow: "none !important",
+              },
+            }}
           >
             Top Up
           </Button>
@@ -157,7 +166,16 @@ export const WalletSolana: FC<{
             variant="contained"
             size="small"
             onClick={() => getTestSol(publicKey)}
-            style={{ margin: 5 }}
+            sx={{
+              margin: 1,
+              textTransform: "none",
+              fontFamily: "Rubik",
+              boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+              borderRadius: "8px !important",
+              "&:hover": {
+                boxShadow: "none !important",
+              },
+            }}
           >
             Get Test SOL
           </Button>
@@ -167,8 +185,30 @@ export const WalletSolana: FC<{
           variant="contained"
           size="small"
           onClick={() => setOpenMint(!openMint)}
-          sx={openMint ? { background: "#1a1f2e" } : {}}
-          style={{ margin: 5 }}
+          sx={
+            openMint
+              ? {
+                  background: "#1a1f2e",
+                  margin: 1,
+                  textTransform: "none",
+                  fontFamily: "Rubik",
+                  boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+                  borderRadius: "8px !important",
+                  "&:hover": {
+                    boxShadow: "none !important",
+                  },
+                }
+              : {
+                  margin: 1,
+                  textTransform: "none",
+                  fontFamily: "Rubik",
+                  boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+                  borderRadius: "8px !important",
+                  "&:hover": {
+                    boxShadow: "none !important",
+                  },
+                }
+          }
         >
           Mint Test NFT
         </Button>
@@ -177,8 +217,30 @@ export const WalletSolana: FC<{
           variant="contained"
           size="small"
           onClick={() => setOpenImportToken(!openImportToken)}
-          sx={openImportToken ? { background: "#1a1f2e" } : {}}
-          style={{ margin: 5 }}
+          sx={
+            openImportToken
+              ? {
+                  background: "#1a1f2e",
+                  margin: 1,
+                  textTransform: "none",
+                  fontFamily: "Rubik",
+                  boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+                  borderRadius: "8px !important",
+                  "&:hover": {
+                    boxShadow: "none !important",
+                  },
+                }
+              : {
+                  margin: 1,
+                  textTransform: "none",
+                  fontFamily: "Rubik",
+                  boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+                  borderRadius: "8px !important",
+                  "&:hover": {
+                    boxShadow: "none !important",
+                  },
+                }
+          }
         >
           SPL Tokens
         </Button>
@@ -187,7 +249,16 @@ export const WalletSolana: FC<{
           variant="contained"
           size="small"
           onClick={() => logout()}
-          style={{ margin: 5 }}
+          sx={{
+            margin: 1,
+            textTransform: "none",
+            fontFamily: "Rubik",
+            boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+            borderRadius: "8px !important",
+            "&:hover": {
+              boxShadow: "none !important",
+            },
+          }}
         >
           Logout
         </Button>

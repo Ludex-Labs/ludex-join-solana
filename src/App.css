@@ -57,7 +57,7 @@ a {
 .chain-container {
   height: 35px;
   width: 35px;
-  margin-bottom: 3px;
+  margin-bottom: 1rem;
   transform: translatey(0px);
   animation: float 4s ease-in-out infinite;
 }
