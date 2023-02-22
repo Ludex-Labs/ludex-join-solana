@@ -230,7 +230,7 @@ function App() {
                     <Box
                       sx={{
                         fontFamily: "Rubik",
-                        ml: viewWallet ? "5px" : 0,
+                        ml: viewWallet ? 0 : "5px",
                         fontSize: "1rem",
                         fontWeight: 500,
                         textTransform: "none",
