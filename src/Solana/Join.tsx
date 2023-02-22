@@ -19,6 +19,7 @@ import {
   MenuItem,
   OutlinedInput,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import DescriptionIcon from "@mui/icons-material/Description";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -50,55 +51,58 @@ export const Join: FC<{
     })();
   }, [publicKey]);
 
-  const sendTransaction = async (transaction: Transaction): Promise<string> => {
+  const verifyError = (error: any, tx: Transaction) => {
+    console.error(error);
+    if (error?.includes("Blockhash not found")) {
+      setTimeout(() => sendTransaction(tx), 2000);
+    } else if (error?.includes("Error Code: ChallengeFull")) {
+      toast.error("Challenge is already full.");
+    } else if (error?.includes("already in use")) {
+      toast.error("This address is already joined.");
+      setJoined(true);
+    } else if (error?.includes("no record of a prior credit")) {
+      toast.error("You don't have enough credit.");
+    } else if (error?.includes("User rejected the request")) {
+      toast.error("Player rejected the request.");
+    } else toast.error("Transaction failed.");
+  };
+
+  const sendTransaction = async (tx: Transaction) => {
+    if (!provider) return "";
     try {
-      if (!provider) {
-        console.error("provider not initialized yet");
-        return "";
-      }
+      setIsLoading(true);
       const solanaWallet = new SolanaWallet(provider);
-      transaction = await solanaWallet.signTransaction(transaction);
-      if (connection) {
-        const signature = await connection.sendRawTransaction(
-          transaction.serialize()
-        );
-        return signature;
-      }
-      return "";
+      tx = await solanaWallet.signTransaction(tx);
+      const sig = await connection.sendRawTransaction(tx.serialize());
+      return sig;
     } catch (error) {
-      console.error(error);
-      console.error((error as any)?.logs);
-      return error as string;
+      let errorString = (error as any)?.logs
+        ? error + " --- LOGS --- " + ((error as any)?.logs).toString()
+        : error?.toString();
+      verifyError(errorString, tx);
+      return errorString ? errorString : "";
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const joinFTChallenge = async () => {
-    if (!wallet || !sendTransaction) return;
-    setIsLoading(true);
-    try {
-      const ludexTx = new Challenge.ChallengeTXClient(
-        connection,
-        challengeAddress,
-        {
-          wallet: wallet,
-          cluster: isMainnet ? "MAINNET" : "DEVNET",
-        }
-      );
-      const tx = await ludexTx.join(wallet.publicKey.toBase58()).getTx();
-      const result = connection.getLatestBlockhash();
-      tx.recentBlockhash = (await result).blockhash;
-      if (!sendTransaction) throw new Error("Failed to send transaction.");
-      const signature = await sendTransaction(tx);
-      if (!signature.toString().includes("Error")) {
-        setJoined(true);
-        setIsLoading(false);
-        toast.success("FT Challenge joined!");
-      } else throw new Error(signature);
-    } catch (e) {
-      console.error(e);
-      toast.error("Failed to join challenge.");
-      setIsLoading(false);
-    }
+    if (!wallet) return;
+    const ludexTx = new Challenge.ChallengeTXClient(
+      connection,
+      challengeAddress,
+      {
+        wallet: wallet,
+        cluster: isMainnet ? "MAINNET" : "DEVNET",
+      }
+    );
+    const tx = await ludexTx.join(wallet.publicKey.toBase58()).getTx();
+    const result = connection.getLatestBlockhash();
+    tx.recentBlockhash = (await result).blockhash;
+    const res = await sendTransaction(tx);
+    if (res.toString().includes("Error")) setJoined(true);
+    toast.success("Challenge joined!");
+    console.info("sig: ", res);
   };
 
   return (
@@ -106,7 +110,7 @@ export const Join: FC<{
       <Typography variant={"h5"} sx={{ mb: 3.5 }}>
         Join Challenge
       </Typography>
-      <FormControl fullWidth sx={{ width: "100%", mb: 3 }}>
+      <FormControl disabled={isLoading} fullWidth sx={{ width: "100%", mb: 3 }}>
         <InputLabel>Challenge Address</InputLabel>
         <OutlinedInput
           onChange={(e) => setChallengeAddress(e.currentTarget.value)}
@@ -138,7 +142,7 @@ export const Join: FC<{
         <InputLabel>Network</InputLabel>
         <Select
           value={isMainnet ? "mainnet" : "devnet"}
-          disabled={joined}
+          disabled={joined || isLoading}
           label="Network"
           onChange={(e) =>
             e.target.value === "mainnet"
@@ -155,7 +159,7 @@ export const Join: FC<{
         <InputLabel>Type</InputLabel>
         <Select
           value={type === "FT" ? "FT" : "NFT"}
-          disabled={joined}
+          disabled={joined || isLoading}
           label="Type"
           onChange={(e) =>
             e.target.value === "FT" ? setType("FT") : setType("NFT")
@@ -185,7 +189,9 @@ export const Join: FC<{
           }}
           onClick={() => joinFTChallenge()}
         >
-          {joined ? (
+          {isLoading ? (
+            <CircularProgress size={24} />
+          ) : joined ? (
             <>
               <CheckCircleOutlineIcon sx={{ mr: 1 }} />
               Joined
