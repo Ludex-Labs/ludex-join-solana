@@ -135,8 +135,7 @@ export const NFTJoin: FC<{
       if (!wallet) return;
       var _offerings = await NFTChallenge.NftChallengeTXClient.getOfferings(
         connection,
-        challengeAddress,
-        wallet
+        challengeAddress
       );
 
       const offerings = _offerings.map((offering: Offering) => {

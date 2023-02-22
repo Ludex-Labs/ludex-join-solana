@@ -19,6 +19,7 @@ import {
   MenuItem,
   OutlinedInput,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import DescriptionIcon from "@mui/icons-material/Description";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
@@ -66,10 +67,49 @@ export const Join: FC<{
       }
       return "";
     } catch (error) {
-      console.error(error);
-      console.error((error as any)?.logs);
-      return error as string;
+      const errorString =
+        error + " --- LOGS --- " + ((error as any)?.logs).toString();
+      return errorString as string;
     }
+  };
+
+  const retryEndpointCall = async (callEndpointFunc: () => Promise<any>) => {
+    let retries = 3;
+    const delay = 3000;
+
+    function retry() {
+      callEndpointFunc()
+        .then((res) => {
+          if (res === "already in use") {
+            setJoined(true);
+            setIsLoading(false);
+          }
+          if (!res.toString().includes("Error")) {
+            setJoined(true);
+            setIsLoading(false);
+            toast.success("FT Challenge joined!");
+            console.log(res);
+            return res;
+          } else throw new Error(res);
+        })
+        .catch((error) => {
+          console.error(error);
+          if (retries > 0) {
+            retries--;
+            console.info(`Retrying... ${retries} attempts left`);
+            setTimeout(retry, delay);
+          } else {
+            setIsLoading(false);
+            if (error?.toString().includes("already in use")) {
+              toast.error("You have already joined this challenge!");
+              setJoined(true);
+            } else toast.error("Failed to join challenge.");
+            return error;
+          }
+        });
+    }
+
+    retry();
   };
 
   const joinFTChallenge = async () => {
@@ -88,16 +128,9 @@ export const Join: FC<{
       const result = connection.getLatestBlockhash();
       tx.recentBlockhash = (await result).blockhash;
       if (!sendTransaction) throw new Error("Failed to send transaction.");
-      const signature = await sendTransaction(tx);
-      if (!signature.toString().includes("Error")) {
-        setJoined(true);
-        setIsLoading(false);
-        toast.success("FT Challenge joined!");
-      } else throw new Error(signature);
+      await retryEndpointCall(() => sendTransaction(tx));
     } catch (e) {
       console.error(e);
-      toast.error("Failed to join challenge.");
-      setIsLoading(false);
     }
   };
 
@@ -175,7 +208,9 @@ export const Join: FC<{
           sx={{ mt: 1 }}
           onClick={() => joinFTChallenge()}
         >
-          {joined ? (
+          {isLoading ? (
+            <CircularProgress size={24} />
+          ) : joined ? (
             <>
               <CheckCircleOutlineIcon sx={{ mr: 1 }} />
               Joined
