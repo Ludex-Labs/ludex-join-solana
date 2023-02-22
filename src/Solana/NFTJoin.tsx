@@ -105,29 +105,19 @@ export const NFTJoin: FC<{
   };
 
   const joinNFTChallenge = async () => {
-    if (publicKey === "") throw Error("Not connected");
     if (!wallet || !sendTransaction) return;
-    setIsLoading(true);
-    try {
-      const ludexTx = new NFTChallenge.NftChallengeTXClient(
-        connection,
-        challengeAddress
-      );
-      const tx = await ludexTx.join(wallet.publicKey.toBase58()).getTx();
-      const result = connection.getLatestBlockhash();
-      tx.recentBlockhash = (await result)?.blockhash;
-      if (!sendTransaction) throw new Error("Failed to send transaction.");
-      const signature = await sendTransaction(tx);
-
-      if (!signature.toString().includes("Error")) {
-        setIsLoading(false);
-        setPlayerStatus("JOINED");
-        toast.success("NFT Challenge joined!");
-      } else throw new Error(signature);
-    } catch (e) {
-      console.error(e);
-      toast.error("Failed to join challenge");
-      setIsLoading(false);
+    const ludexTx = new NFTChallenge.NftChallengeTXClient(
+      connection,
+      challengeAddress
+    );
+    const tx = await ludexTx.join(wallet.publicKey.toBase58()).getTx();
+    const result = connection.getLatestBlockhash();
+    tx.recentBlockhash = (await result)?.blockhash;
+    const res = await sendTransaction(tx);
+    if (!res.toString().includes("Error")) {
+      setPlayerStatus("JOINED");
+      toast.success("NFT Challenge joined!");
+      console.info("sig: ", res);
     }
   };
 
@@ -169,87 +159,64 @@ export const NFTJoin: FC<{
     }
   }, [challengeAddress, wallet]);
 
-  const onClickAddOffering = async (type: string) => {
-    setIsLoading(true);
-    try {
-      const ludexTx = new NFTChallenge.NftChallengeTXClient(
-        connection,
-        challengeAddress
-      );
-      var tx: Transaction | undefined;
-      if (type === "SOL") {
-        tx = await ludexTx.addSolOffering(publicKey, amount).getTx();
-      } else if (type === "NFT") {
-        tx = await ludexTx.addNftOffering(publicKey, NFTmint, 1).getTx();
-      } else throw new Error("Invalid offering type");
-      const result = await connection.getLatestBlockhash();
-      tx.recentBlockhash = result.blockhash;
-      tx.feePayer = new PublicKey(publicKey);
-      if (!sendTransaction) return;
-      const res = await sendTransaction(tx);
-      if (res.toString().includes("Error")) throw new Error(res);
-      else toast.success("Offering added!");
-      setIsLoading(false);
-      setOpen(false);
-      getOfferings();
-    } catch (e) {
-      toast.error("Error adding offering.");
-      setIsLoading(false);
-    }
+  const addOffering = async (type: string) => {
+    const ludexTx = new NFTChallenge.NftChallengeTXClient(
+      connection,
+      challengeAddress
+    );
+    var tx: Transaction | undefined;
+    if (type === "SOL") {
+      tx = await ludexTx.addSolOffering(publicKey, amount).getTx();
+    } else if (type === "NFT") {
+      tx = await ludexTx.addNftOffering(publicKey, NFTmint, 1).getTx();
+    } else throw new Error("Invalid offering type");
+    const result = await connection.getLatestBlockhash();
+    tx.recentBlockhash = result.blockhash;
+    tx.feePayer = new PublicKey(publicKey);
+    if (!sendTransaction) return;
+    const res = await sendTransaction(tx);
+    if (res.toString().includes("Error")) return;
+    toast.success("Offering added!");
+    setNFTmint("");
+    setOpen(false);
+    console.info("sig: ", res);
   };
 
-  const onClickRemoveOffering = async () => {
-    setIsLoading(true);
-    try {
-      const ludexTx = new NFTChallenge.NftChallengeTXClient(
-        connection,
-        challengeAddress
-      );
-      if (!selectedOffering?.publicKey) return;
-      var tx = await ludexTx
-        .removeOffering(publicKey, selectedOffering?.publicKey)
-        .getTx();
-      const result = await connection.getLatestBlockhash();
-      tx.recentBlockhash = result.blockhash;
-      tx.feePayer = new PublicKey(publicKey);
-      if (sendTransaction) {
-        const res = await sendTransaction(tx);
-        if (res.toString().includes("Error")) throw new Error(res);
-        toast.success("Offering removing!");
-        setOpenOffering(false);
-      }
-      setIsLoading(false);
-    } catch (e) {
-      console.error(e);
-      toast.error("Error removing offering.");
-      setIsLoading(false);
-    }
+  const removeOffering = async () => {
+    const ludexTx = new NFTChallenge.NftChallengeTXClient(
+      connection,
+      challengeAddress
+    );
+    if (!selectedOffering?.publicKey) return;
+    var tx = await ludexTx
+      .removeOffering(publicKey, selectedOffering?.publicKey)
+      .getTx();
+    const result = await connection.getLatestBlockhash();
+    tx.recentBlockhash = result.blockhash;
+    tx.feePayer = new PublicKey(publicKey);
+    if (!sendTransaction) return;
+    const res = await sendTransaction(tx);
+    if (res.toString().includes("Error")) return;
+    toast.success("Offering removing!");
+    setOpenOffering(false);
+    console.info("sig: ", res);
   };
 
   const acceptOffering = async () => {
-    setIsLoading(true);
-    try {
-      const ludexTx = new NFTChallenge.NftChallengeTXClient(
-        connection,
-        challengeAddress
-      );
-      var tx = await ludexTx.accept(publicKey).getTx();
-      const result = await connection.getLatestBlockhash();
-      tx.recentBlockhash = result.blockhash;
-      tx.feePayer = new PublicKey(publicKey);
-      if (!sendTransaction) return;
-      const signature = await sendTransaction(tx);
-      if (!signature.toString().includes("Error")) {
-        setIsLoading(false);
-        setAccepted(true);
-        toast.success("Offering accepted!");
-      } else throw new Error(signature);
-      setIsLoading(false);
-    } catch (e) {
-      console.error(e);
-      toast.error("Error accepting offering.");
-      setIsLoading(false);
-    }
+    const ludexTx = new NFTChallenge.NftChallengeTXClient(
+      connection,
+      challengeAddress
+    );
+    var tx = await ludexTx.accept(publicKey).getTx();
+    const result = await connection.getLatestBlockhash();
+    tx.recentBlockhash = result.blockhash;
+    tx.feePayer = new PublicKey(publicKey);
+    if (!sendTransaction) return;
+    const res = await sendTransaction(tx);
+    if (res.toString().includes("Error")) return;
+    toast.success("Offering accepted!");
+    setAccepted(true);
+    console.info("sig: ", res);
   };
 
   const onClickOffering = async (offering: any) => {
@@ -350,8 +317,9 @@ export const NFTJoin: FC<{
         disabled={
           isLoading ||
           accepted ||
+          challengeAddress.length !== 44 ||
           playerStatus === "ACCEPTED" ||
-          challengeAddress.length !== 44
+          playerStatus === "NOT_IN_GAME"
         }
       >
         Add Offering
@@ -366,7 +334,8 @@ export const NFTJoin: FC<{
           isLoading ||
           accepted ||
           challengeAddress.length !== 44 ||
-          playerStatus === "ACCEPTED"
+          playerStatus === "ACCEPTED" ||
+          playerStatus === "NOT_IN_GAME"
         }
       >
         {playerStatus !== "ACCEPTED" ? (
@@ -422,7 +391,7 @@ export const NFTJoin: FC<{
               size="small"
               variant="contained"
               sx={{ mb: 2 }}
-              onClick={() => onClickAddOffering("SOL")}
+              onClick={() => addOffering("SOL")}
               disabled={isLoading || amount === 0}
             >
               Add SOL Offering
@@ -455,8 +424,8 @@ export const NFTJoin: FC<{
               size="small"
               fullWidth
               variant="contained"
-              onClick={() => onClickAddOffering("NFT")}
-              disabled={isLoading || NFTmint === ""}
+              onClick={() => addOffering("NFT")}
+              disabled={isLoading || NFTmint?.length !== 44}
               sx={{ mb: 2 }}
             >
               Add NFT Offering
@@ -569,7 +538,7 @@ export const NFTJoin: FC<{
               fullWidth
               variant="contained"
               sx={{ mb: 2, borderTopRightRadius: 0, borderTopLeftRadius: 0 }}
-              onClick={() => onClickRemoveOffering()}
+              onClick={() => removeOffering()}
               disabled={
                 isLoading ||
                 selectedOffering?.authority !== wallet?.publicKey?.toBase58()

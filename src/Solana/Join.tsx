@@ -51,17 +51,20 @@ export const Join: FC<{
     })();
   }, [publicKey]);
 
-  const verifyError = (errorString: any, tx: Transaction) => {
-    if (errorString?.includes("Blockhash not found")) {
-      setTimeout(() => sendTransaction(tx), 1000);
-    } else if (errorString?.includes("Error Code: ChallengeFull")) {
+  const verifyError = (error: any, tx: Transaction) => {
+    console.error(error);
+    if (error?.includes("Blockhash not found")) {
+      setTimeout(() => sendTransaction(tx), 2000);
+    } else if (error?.includes("Error Code: ChallengeFull")) {
       toast.error("Challenge is already full.");
-    } else if (errorString?.includes("already in use")) {
-      toast.error("You have already joined this challenge.");
+    } else if (error?.includes("already in use")) {
+      toast.error("This address is already joined.");
       setJoined(true);
-    } else if (errorString?.includes("no record of a prior credit")) {
-      toast.error("You don't have enough credit for the entry fee.");
-    } else toast.error("Failed to join challenge.");
+    } else if (error?.includes("no record of a prior credit")) {
+      toast.error("You don't have enough credit.");
+    } else if (error?.includes("User rejected the request")) {
+      toast.error("Player rejected the request.");
+    } else toast.error("Transaction failed.");
   };
 
   const sendTransaction = async (tx: Transaction) => {
@@ -97,11 +100,9 @@ export const Join: FC<{
     const result = connection.getLatestBlockhash();
     tx.recentBlockhash = (await result).blockhash;
     const res = await sendTransaction(tx);
-    if (!res.toString().includes("Error")) {
-      setJoined(true);
-      toast.success("Challenge joined!");
-      console.info("sig: ", res);
-    }
+    if (res.toString().includes("Error")) setJoined(true);
+    toast.success("Challenge joined!");
+    console.info("sig: ", res);
   };
 
   return (
