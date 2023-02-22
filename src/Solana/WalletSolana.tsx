@@ -215,7 +215,7 @@ export const WalletSolana: FC<{
           SPL Tokens
         </Button>
 
-        <Button
+        {/* <Button
           variant="contained"
           size="small"
           onClick={() => logout()}
@@ -224,7 +224,7 @@ export const WalletSolana: FC<{
           }}
         >
           Logout
-        </Button>
+        </Button> */}
       </Box>
 
       <Dialog
