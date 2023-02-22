@@ -23,9 +23,8 @@ import {
 } from "@mui/material";
 import NotesIcon from "@mui/icons-material/Notes";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import SettingsIcon from "@mui/icons-material/Settings";
 import UploadIcon from "@mui/icons-material/Upload";
-import CircularProgress from "@mui/material/CircularProgress";
 
 // Button Style
 const buttonStyles = {
@@ -61,17 +60,19 @@ export const WalletSolana: FC<{
   const [openMint, setOpenMint] = useState(false);
   const [openImportToken, setOpenImportToken] = useState(false);
   const [tokenToImport, setTokenToImport] = useState("");
-  const [fetchingBalance, setFetchingBalance] = useState(false);
 
   const getBalance = async () => {
-    setFetchingBalance(true);
     if (!provider) {
       console.error("provider not initialized yet");
       return;
     }
     const rpc = new RPC(provider);
     const _balance = await rpc.getBalance(connection);
-    setBalance(parseInt(_balance) / 10 ** 9);
+    if (_balance?.toString().includes("Error")) {
+      toast.error("Error getting balance");
+      setBalance(0);
+      return;
+    } else setBalance(parseInt(_balance) / 10 ** 9);
   };
 
   useEffect(() => {
@@ -92,8 +93,7 @@ export const WalletSolana: FC<{
           disabled
           endAdornment={
             <InputAdornment position="end">
-              <Button
-                variant="contained"
+              <IconButton
                 onClick={() => {
                   window.open(
                     "https://solana.tor.us/wallet/transfer?instanceId=" +
@@ -103,8 +103,8 @@ export const WalletSolana: FC<{
                   );
                 }}
               >
-                <ChevronRightIcon />
-              </Button>
+                <SettingsIcon />
+              </IconButton>
             </InputAdornment>
           }
           fullWidth
@@ -117,26 +117,6 @@ export const WalletSolana: FC<{
           value={balance?.toString() + " SOL"}
           label="Wallet"
           disabled
-          endAdornment={
-            <InputAdornment position="end">
-              <Button
-                variant="contained"
-                disabled={balance === undefined}
-                onClick={() => {
-                  setFetchingBalance(true); // set the state to show the progress indicator
-                  getBalance().then(() => {
-                    setFetchingBalance(false); // set the state to hide the progress indicator
-                  });
-                }}
-              >
-                {fetchingBalance ? (
-                  <CircularProgress size={24} />
-                ) : (
-                  <RefreshIcon />
-                )}
-              </Button>
-            </InputAdornment>
-          }
           fullWidth
         />
       </FormControl>
@@ -180,7 +160,10 @@ export const WalletSolana: FC<{
           <Button
             variant="contained"
             size="small"
-            onClick={() => getTestSol(publicKey)}
+            onClick={async () => {
+              await getTestSol(publicKey);
+              getBalance();
+            }}
             sx={{
               ...buttonStyles,
             }}
