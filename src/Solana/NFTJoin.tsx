@@ -85,6 +85,7 @@ export const NFTJoin: FC<{
   const [openOffering, setOpenOffering] = useState<boolean>(false);
   const [accepted, setAccepted] = useState<boolean>(false);
   const [playerStatus, setPlayerStatus] = useState<string>("");
+  const [escrowless, setEscrowless] = useState<boolean>(false);
 
   useEffect(() => {
     if (challengeAddress.length !== 44) return;
@@ -439,16 +440,15 @@ export const NFTJoin: FC<{
               onChange={(e) => setNFTmint(e.currentTarget.value)}
             />
 
-            {/* TO DO - add escrowless  */}
             <FormGroup>
               <FormControlLabel
+                label="Escrowless"
                 control={
                   <Checkbox
-                    checked={false}
-                    onClick={() => toast.error("Escrowless not available yet.")}
+                    checked={escrowless}
+                    onClick={() => setEscrowless(!escrowless)}
                   />
                 }
-                label="Escrowless"
               />
             </FormGroup>
             <Button

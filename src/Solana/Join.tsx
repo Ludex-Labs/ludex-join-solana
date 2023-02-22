@@ -51,86 +51,56 @@ export const Join: FC<{
     })();
   }, [publicKey]);
 
-  const sendTransaction = async (transaction: Transaction): Promise<string> => {
-    try {
-      if (!provider) {
-        console.error("provider not initialized yet");
-        return "";
-      }
-      const solanaWallet = new SolanaWallet(provider);
-      transaction = await solanaWallet.signTransaction(transaction);
-      if (connection) {
-        const signature = await connection.sendRawTransaction(
-          transaction.serialize()
-        );
-        return signature;
-      }
-      return "";
-    } catch (error) {
-      const errorString =
-        error + " --- LOGS --- " + ((error as any)?.logs).toString();
-      return errorString as string;
-    }
+  const verifyError = (errorString: any, tx: Transaction) => {
+    if (errorString?.includes("Blockhash not found")) {
+      setTimeout(() => sendTransaction(tx), 1000);
+    } else if (errorString?.includes("Error Code: ChallengeFull")) {
+      toast.error("Challenge is already full.");
+    } else if (errorString?.includes("already in use")) {
+      toast.error("You have already joined this challenge.");
+      setJoined(true);
+    } else if (errorString?.includes("no record of a prior credit")) {
+      toast.error("You don't have enough credit for the entry fee.");
+    } else toast.error("Failed to join challenge.");
   };
 
-  const retryEndpointCall = async (callEndpointFunc: () => Promise<any>) => {
-    let retries = 3;
-    const delay = 3000;
-
-    function retry() {
-      callEndpointFunc()
-        .then((res) => {
-          if (res === "already in use") {
-            setJoined(true);
-            setIsLoading(false);
-          }
-          if (!res.toString().includes("Error")) {
-            setJoined(true);
-            setIsLoading(false);
-            toast.success("FT Challenge joined!");
-            console.log(res);
-            return res;
-          } else throw new Error(res);
-        })
-        .catch((error) => {
-          console.error(error);
-          if (retries > 0) {
-            retries--;
-            console.info(`Retrying... ${retries} attempts left`);
-            setTimeout(retry, delay);
-          } else {
-            setIsLoading(false);
-            if (error?.toString().includes("already in use")) {
-              toast.error("You have already joined this challenge!");
-              setJoined(true);
-            } else toast.error("Failed to join challenge.");
-            return error;
-          }
-        });
+  const sendTransaction = async (tx: Transaction) => {
+    if (!provider) return "";
+    try {
+      setIsLoading(true);
+      const solanaWallet = new SolanaWallet(provider);
+      tx = await solanaWallet.signTransaction(tx);
+      const sig = await connection.sendRawTransaction(tx.serialize());
+      return sig;
+    } catch (error) {
+      let errorString = (error as any)?.logs
+        ? error + " --- LOGS --- " + ((error as any)?.logs).toString()
+        : error?.toString();
+      verifyError(errorString, tx);
+      return errorString ? errorString : "";
+    } finally {
+      setIsLoading(false);
     }
-
-    retry();
   };
 
   const joinFTChallenge = async () => {
-    if (!wallet || !sendTransaction) return;
-    setIsLoading(true);
-    try {
-      const ludexTx = new Challenge.ChallengeTXClient(
-        connection,
-        challengeAddress,
-        {
-          wallet: wallet,
-          cluster: isMainnet ? "MAINNET" : "DEVNET",
-        }
-      );
-      const tx = await ludexTx.join(wallet.publicKey.toBase58()).getTx();
-      const result = connection.getLatestBlockhash();
-      tx.recentBlockhash = (await result).blockhash;
-      if (!sendTransaction) throw new Error("Failed to send transaction.");
-      await retryEndpointCall(() => sendTransaction(tx));
-    } catch (e) {
-      console.error(e);
+    if (!wallet) return;
+    const ludexTx = new Challenge.ChallengeTXClient(
+      connection,
+      challengeAddress,
+      {
+        wallet: wallet,
+        cluster: isMainnet ? "MAINNET" : "DEVNET",
+      }
+    );
+    const tx = await ludexTx.join(wallet.publicKey.toBase58()).getTx();
+    const result = connection.getLatestBlockhash();
+    tx.recentBlockhash = (await result).blockhash;
+    const res = await sendTransaction(tx);
+    if (!res.toString().includes("Error")) {
+      setJoined(true);
+      toast.success("Challenge joined!");
+      console.info("sig: ", res);
     }
   };
 
@@ -139,7 +109,7 @@ export const Join: FC<{
       <Typography variant={"h5"} sx={{ mb: 2 }}>
         Join Challenge
       </Typography>
-      <FormControl fullWidth sx={{ width: "100%", mb: 3 }}>
+      <FormControl disabled={isLoading} fullWidth sx={{ width: "100%", mb: 3 }}>
         <InputLabel>Challenge Address</InputLabel>
         <OutlinedInput
           onChange={(e) => setChallengeAddress(e.currentTarget.value)}
@@ -171,7 +141,7 @@ export const Join: FC<{
         <InputLabel>Network</InputLabel>
         <Select
           value={isMainnet ? "mainnet" : "devnet"}
-          disabled={joined}
+          disabled={joined || isLoading}
           label="Network"
           onChange={(e) =>
             e.target.value === "mainnet"
@@ -188,7 +158,7 @@ export const Join: FC<{
         <InputLabel>Type</InputLabel>
         <Select
           value={type === "FT" ? "FT" : "NFT"}
-          disabled={joined}
+          disabled={joined || isLoading}
           label="Type"
           onChange={(e) =>
             e.target.value === "FT" ? setType("FT") : setType("NFT")
