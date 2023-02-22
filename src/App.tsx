@@ -29,6 +29,7 @@ function App() {
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
     null
   );
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     const initWeb3Auth = async () => {
@@ -106,6 +107,7 @@ function App() {
     const web3authProvider = await web3auth.connect();
     setProvider(web3authProvider);
     await changeNetwork("devnet");
+    setLoggedIn(true);
     toast.success("Logged in Successfully!");
   };
 
@@ -137,10 +139,12 @@ function App() {
           className="chain-container"
         />
         <span className="join-container">
-          <Box sx={{ fontSize: "20px", mb: 4 }}>
-            Please click on the button
-            <br /> below to sign in
-          </Box>
+          {loggedIn ? null : (
+            <Box sx={{ fontSize: "20px", mb: 4 }}>
+              Please click on the button
+              <br /> below to sign in
+            </Box>
+          )}
           {provider && viewWallet && connection ? (
             <WalletSolana
               publicKey={wallet?.publicKey?.toString() || ""}
