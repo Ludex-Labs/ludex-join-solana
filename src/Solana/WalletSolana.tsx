@@ -23,8 +23,9 @@ import {
 } from "@mui/material";
 import NotesIcon from "@mui/icons-material/Notes";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import SendIcon from "@mui/icons-material/Send";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import UploadIcon from "@mui/icons-material/Upload";
+import CircularProgress from "@mui/material/CircularProgress";
 
 // Button Style
 const buttonStyles = {
@@ -60,8 +61,10 @@ export const WalletSolana: FC<{
   const [openMint, setOpenMint] = useState(false);
   const [openImportToken, setOpenImportToken] = useState(false);
   const [tokenToImport, setTokenToImport] = useState("");
+  const [fetchingBalance, setFetchingBalance] = useState(false);
 
   const getBalance = async () => {
+    setFetchingBalance(true);
     if (!provider) {
       console.error("provider not initialized yet");
       return;
@@ -100,7 +103,7 @@ export const WalletSolana: FC<{
                   );
                 }}
               >
-                <SendIcon />
+                <ChevronRightIcon />
               </Button>
             </InputAdornment>
           }
@@ -120,10 +123,17 @@ export const WalletSolana: FC<{
                 variant="contained"
                 disabled={balance === undefined}
                 onClick={() => {
-                  getBalance();
+                  setFetchingBalance(true); // set the state to show the progress indicator
+                  getBalance().then(() => {
+                    setFetchingBalance(false); // set the state to hide the progress indicator
+                  });
                 }}
               >
-                <RefreshIcon />
+                {fetchingBalance ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  <RefreshIcon />
+                )}
               </Button>
             </InputAdornment>
           }
