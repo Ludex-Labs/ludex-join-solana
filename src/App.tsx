@@ -223,12 +223,14 @@ function App() {
                   }}
                   onClick={() => setViewWallet(!viewWallet)}
                 >
-                  <WalletIcon sx={{ width: "25px", height: "25px" }} />
+                  {!viewWallet && (
+                    <WalletIcon sx={{ width: "25px", height: "25px" }} />
+                  )}
                   <>
                     <Box
                       sx={{
                         fontFamily: "Rubik",
-                        ml: "5px",
+                        ml: viewWallet ? "5px" : 0,
                         fontSize: "1rem",
                         fontWeight: 500,
                         textTransform: "none",
