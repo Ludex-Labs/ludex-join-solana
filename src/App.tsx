@@ -137,6 +137,10 @@ function App() {
           className="chain-container"
         />
         <span className="join-container">
+          <Box sx={{ fontSize: "20px", mb: 4 }}>
+            Please click on the button
+            <br /> below to sign in
+          </Box>
           {provider && viewWallet && connection ? (
             <WalletSolana
               publicKey={wallet?.publicKey?.toString() || ""}
