@@ -46,7 +46,8 @@ a {
   background: #374151;
   border-radius: 15px;
   padding: 30px;
-  min-width: 350px;
+  width: 317px;
+  /* max-width: 350px; */
   min-height: 300px;
   display: flex;
   justify-content: center;

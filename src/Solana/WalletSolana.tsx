@@ -78,7 +78,7 @@ export const WalletSolana: FC<{
 
   return (
     <>
-      <Typography variant={"h5"} sx={{ mb: 2 }}>
+      <Typography variant={"h5"} sx={{ mb: 3.5 }}>
         Your Wallet
       </Typography>
       <FormControl fullWidth sx={{ width: "100%", mb: 2 }}>
