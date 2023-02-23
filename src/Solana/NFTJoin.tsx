@@ -234,8 +234,17 @@ export const NFTJoin: FC<{
   return (
     <>
       <Button
+        className="join-button"
         fullWidth
         size="large"
+        variant="contained"
+        onClick={() => joinNFTChallenge()}
+        disabled={
+          isLoading ||
+          challengeAddress.length !== 44 ||
+          playerStatus === "JOINED" ||
+          playerStatus === "ACCEPTED"
+        }
         sx={{
           backgroundColor: "#3eb718",
           mt: 1,
@@ -245,15 +254,9 @@ export const NFTJoin: FC<{
           borderRadius: "10px !important",
           "&:hover": {
             boxShadow: "none !important",
+            backgroundColor: "#ff714f14",
           },
         }}
-        onClick={() => joinNFTChallenge()}
-        disabled={
-          isLoading ||
-          challengeAddress.length !== 44 ||
-          playerStatus === "JOINED" ||
-          playerStatus === "ACCEPTED"
-        }
       >
         {playerStatus === "JOINED" || playerStatus === "ACCEPTED" ? (
           <>
@@ -265,7 +268,7 @@ export const NFTJoin: FC<{
         )}
       </Button>
 
-      <FormControl fullWidth sx={{ mb: 0, mt: 4 }}>
+      <FormControl fullWidth sx={{ mb: 1, mt: 4 }}>
         <InputLabel>Offerings</InputLabel>
         <Select
           multiple
@@ -319,40 +322,66 @@ export const NFTJoin: FC<{
         </IconButton>
       </FormControl>
       <Button
+        className="join-button"
         onClick={() => setOpen(!open)}
         fullWidth
         variant="contained"
-        sx={{ mb: 1, borderTopRightRadius: 0, borderTopLeftRadius: 0 }}
-        disabled={
-          isLoading ||
-          accepted ||
-          challengeAddress.length !== 44 ||
-          playerStatus === "ACCEPTED" ||
-          playerStatus === "NOT_IN_GAME"
-        }
+        size="large"
+        // disabled={
+        //   isLoading ||
+        //   accepted ||
+        //   challengeAddress.length !== 44 ||
+        //   playerStatus === "ACCEPTED" ||
+        //   playerStatus === "NOT_IN_GAME"
+        // }
+        sx={{
+          backgroundColor: "#3eb718",
+          mt: 1,
+          fontFamily: "Rubik",
+          textTransform: "none",
+          boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+          borderRadius: "10px !important",
+          "&:hover": {
+            boxShadow: "none !important",
+            backgroundColor: "#ff714f14",
+          },
+        }}
       >
         Add Offering
       </Button>
 
       <Button
+        className="join-button"
         fullWidth
         variant="contained"
         onClick={() => acceptOffering()}
         size="large"
-        disabled={
-          isLoading ||
-          accepted ||
-          challengeAddress.length !== 44 ||
-          playerStatus === "ACCEPTED" ||
-          playerStatus === "NOT_IN_GAME"
-        }
+        // disabled={
+        //   isLoading ||
+        //   accepted ||
+        //   challengeAddress.length !== 44 ||
+        //   playerStatus === "ACCEPTED" ||
+        //   playerStatus === "NOT_IN_GAME"
+        // }
+        sx={{
+          backgroundColor: "#3eb718",
+          mt: 1,
+          fontFamily: "Rubik",
+          textTransform: "none",
+          boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+          borderRadius: "10px !important",
+          "&:hover": {
+            boxShadow: "none !important",
+            backgroundColor: "#ff714f14",
+          },
+        }}
       >
-        {playerStatus !== "ACCEPTED" ? (
-          "ACCEPT"
+        {playerStatus !== "Accepted" ? (
+          "Accept"
         ) : (
           <>
             <CheckCircleOutlineIcon sx={{ mr: 1 }} />
-            ACCEPTED
+            Accepted
           </>
         )}
       </Button>
