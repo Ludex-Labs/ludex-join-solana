@@ -174,14 +174,15 @@ export const Join: FC<{
         <Button
           className="join-button"
           fullWidth
-          variant="contained"
-          size="large"
+          // variant="contained"
+          // size="large"
           disabled={isLoading || challengeAddress.length < 35 || joined}
           sx={{
+            backgroundColor: "#3eb718",
             mt: 1,
             fontFamily: "Rubik",
             textTransform: "none",
-            boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+            boxShadow: "#3eb71870 0px 8px 16px 0px!important",
             borderRadius: "8px !important",
             "&:hover": {
               boxShadow: "none !important",

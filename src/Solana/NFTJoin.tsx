@@ -235,9 +235,18 @@ export const NFTJoin: FC<{
     <>
       <Button
         fullWidth
-        variant="contained"
         size="large"
-        sx={{ mt: 1 }}
+        sx={{
+          backgroundColor: "#3eb718",
+          mt: 1,
+          fontFamily: "Rubik",
+          textTransform: "none",
+          boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+          borderRadius: "10px !important",
+          "&:hover": {
+            boxShadow: "none !important",
+          },
+        }}
         onClick={() => joinNFTChallenge()}
         disabled={
           isLoading ||
