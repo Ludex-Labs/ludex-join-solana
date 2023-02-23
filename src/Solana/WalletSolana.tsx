@@ -36,10 +36,10 @@ const buttonStyles = {
   minWidth: "100% !important",
   background: "linear-gradient(90deg, #9945FF 0%, #14F195 100%) !important",
   border: "1.5px solid rgba(255, 255, 255, 0.8)",
+  transition: "all 0.3s ease 0s",
   "&:hover": {
     boxShadow: "none !important",
-    background: "#ff714f14 !important",
-    transition: "all 0.3s ease 0s",
+    background: "#374151 !important",
   },
 };
 
