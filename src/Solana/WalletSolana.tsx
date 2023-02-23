@@ -31,10 +31,15 @@ const buttonStyles = {
   margin: 1,
   textTransform: "none",
   fontFamily: "Rubik",
-  boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+  boxShadow: "#9945ff2e 0px 8px 16px 0px !important",
   borderRadius: "8px !important",
+  minWidth: "100% !important",
+  background: "linear-gradient(90deg, #9945FF 0%, #14F195 100%) !important",
+  border: "1.5px solid rgba(255, 255, 255, 0.8)",
   "&:hover": {
     boxShadow: "none !important",
+    background: "#ff714f14 !important",
+    transition: "all 0.3s ease 0s",
   },
 };
 
@@ -121,7 +126,7 @@ export const WalletSolana: FC<{
         />
       </FormControl>
 
-      <FormControl fullWidth sx={{ mb: 3 }}>
+      <FormControl fullWidth sx={{ mb: 2 }}>
         <InputLabel>Network</InputLabel>
         <Select
           value={isMainnet ? "mainnet" : "devnet"}
@@ -179,7 +184,7 @@ export const WalletSolana: FC<{
           sx={
             openMint
               ? {
-                  background: "#1a1f2e",
+                  // background: "#1a1f2e",
                   ...buttonStyles,
                 }
               : {
@@ -197,7 +202,7 @@ export const WalletSolana: FC<{
           sx={
             openImportToken
               ? {
-                  background: "#1a1f2e",
+                  // background: "#1a1f2e",
                   ...buttonStyles,
                 }
               : {
