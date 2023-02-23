@@ -327,19 +327,19 @@ export const NFTJoin: FC<{
         fullWidth
         variant="contained"
         size="large"
-        // disabled={
-        //   isLoading ||
-        //   accepted ||
-        //   challengeAddress.length !== 44 ||
-        //   playerStatus === "ACCEPTED" ||
-        //   playerStatus === "NOT_IN_GAME"
-        // }
+        disabled={
+          isLoading ||
+          accepted ||
+          challengeAddress.length !== 44 ||
+          playerStatus === "ACCEPTED" ||
+          playerStatus === "NOT_IN_GAME"
+        }
         sx={{
-          backgroundColor: "#3eb718",
+          backgroundColor: "#349bc6",
           mt: 1,
           fontFamily: "Rubik",
           textTransform: "none",
-          boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+          boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
           borderRadius: "10px !important",
           "&:hover": {
             boxShadow: "none !important",
@@ -356,16 +356,16 @@ export const NFTJoin: FC<{
         variant="contained"
         onClick={() => acceptOffering()}
         size="large"
-        // disabled={
-        //   isLoading ||
-        //   accepted ||
-        //   challengeAddress.length !== 44 ||
-        //   playerStatus === "ACCEPTED" ||
-        //   playerStatus === "NOT_IN_GAME"
-        // }
+        disabled={
+          isLoading ||
+          accepted ||
+          challengeAddress.length !== 44 ||
+          playerStatus === "ACCEPTED" ||
+          playerStatus === "NOT_IN_GAME"
+        }
         sx={{
           backgroundColor: "#3eb718",
-          mt: 1,
+          mt: 2,
           fontFamily: "Rubik",
           textTransform: "none",
           boxShadow: "#3eb71870 0px 8px 16px 0px!important",
