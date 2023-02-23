@@ -225,7 +225,11 @@ export const WalletSolana: FC<{
         onClose={() => setOpenImportToken(false)}
         open={openImportToken}
       >
-        <DialogTitle sx={{ textAlign: "center" }}>SPL Tokens</DialogTitle>
+        <DialogTitle
+          sx={{ textAlign: "center", fontFamily: "Rubik", fontWeight: 400 }}
+        >
+          SPL Tokens
+        </DialogTitle>
         <Box>
           <FormControl fullWidth>
             <InputLabel>Import Token</InputLabel>

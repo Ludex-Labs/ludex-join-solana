@@ -64,12 +64,21 @@ export const NFTMint: FC<{
 
   return (
     <Dialog
-      className="dark-dialog "
+      className="dark-dialog"
       onClose={() => setOpenMint(false)}
       open={openMint}
     >
       <Box sx={{ minWidth: "300px" }}>
-        <DialogTitle> Mint Test NFT</DialogTitle>
+        <DialogTitle
+          sx={{
+            textAlign: "center",
+            fontFamily: "Rubik !important",
+            fontWeight: 400,
+          }}
+        >
+          {" "}
+          Mint Test NFT
+        </DialogTitle>
         <Box
           sx={{
             display: "flex",
@@ -108,7 +117,18 @@ export const NFTMint: FC<{
             disabled={isLoading}
             variant="contained"
             onClick={() => mintNft()}
-            sx={{ m: 1 }}
+            sx={{
+              backgroundColor: "#ff714f",
+              mt: 1,
+              fontFamily: "Rubik",
+              textTransform: "none",
+              boxShadow: "rgba(255, 113, 79, 0.24) 0px 8px 16px 0px",
+              borderRadius: "8px !important",
+              "&:hover": {
+                boxShadow: "none !important",
+                backgroundColor: "#ff714f14",
+              },
+            }}
           >
             Mint NFT
           </Button>

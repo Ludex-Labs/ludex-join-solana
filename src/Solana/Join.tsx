@@ -174,8 +174,8 @@ export const Join: FC<{
         <Button
           className="join-button"
           fullWidth
-          // variant="contained"
-          // size="large"
+          variant="contained"
+          size="large"
           disabled={isLoading || challengeAddress.length < 35 || joined}
           sx={{
             backgroundColor: "#3eb718",
@@ -186,6 +186,7 @@ export const Join: FC<{
             borderRadius: "8px !important",
             "&:hover": {
               boxShadow: "none !important",
+              backgroundColor: "#ff714f14",
             },
           }}
           onClick={() => joinFTChallenge()}

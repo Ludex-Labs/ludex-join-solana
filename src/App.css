@@ -85,9 +85,10 @@ a {
 
 .dark-dialog .MuiPaper-root {
   background: #374151;
-  border-radius: 32px;
+  border-radius: 15px;
   padding: 30px;
   padding-top: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .dark-dialog-slim .MuiBackdrop-root {
