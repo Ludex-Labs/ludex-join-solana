@@ -267,7 +267,7 @@ function App() {
                     mb: 1,
                   }}
                 >
-                  POWERED BY
+                  POWERED WITH
                 </Box>
                 <img
                   alt="solana"
