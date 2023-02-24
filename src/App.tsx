@@ -199,7 +199,10 @@ function App() {
                       boxShadow: "none !important",
                     },
                   }}
-                  onClick={() => logout()}
+                  onClick={() => {
+                    logout();
+                    window.location.reload();
+                  }}
                 >
                   Logout
                 </Button>
