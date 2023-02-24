@@ -133,9 +133,24 @@ function App() {
       <Box className="container-page">
         <span className="join-container">
           {!connection && (
-            <Box sx={{ fontSize: "20px", mb: 4 }}>
-              Please click on the button
-              <br /> below to sign in
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Box sx={{ mb: 4, width: "80%", height: "80%" }}>
+                <img
+                  src="../assets/ludex-logo.svg"
+                  alt="Ludex"
+                  className="logo"
+                />
+              </Box>
+              <Box sx={{ fontSize: "20px", mb: 5 }}>
+                Please click on the button
+                <br /> below to sign in
+              </Box>
             </Box>
           )}
           {provider && viewWallet && connection ? (
