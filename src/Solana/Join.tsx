@@ -100,9 +100,11 @@ export const Join: FC<{
     const result = connection.getLatestBlockhash();
     tx.recentBlockhash = (await result).blockhash;
     const res = await sendTransaction(tx);
-    if (res.toString().includes("Error")) setJoined(true);
-    toast.success("Challenge joined!");
-    console.info("sig: ", res);
+    if (!res.toString().includes("Error")) {
+      setJoined(true);
+      toast.success("Challenge joined!");
+      console.info("sig: ", res);
+    }
   };
 
   return (

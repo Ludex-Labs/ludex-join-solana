@@ -201,7 +201,9 @@ function App() {
                   }}
                   onClick={() => {
                     logout();
-                    window.location.reload();
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 1000);
                   }}
                 >
                   Logout
