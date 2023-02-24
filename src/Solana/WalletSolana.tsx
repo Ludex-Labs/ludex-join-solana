@@ -28,7 +28,6 @@ import UploadIcon from "@mui/icons-material/Upload";
 
 // Button Style
 const buttonStyles = {
-  margin: 1,
   textTransform: "none",
   fontFamily: "Rubik",
   boxShadow: "#9945ff2e 0px 8px 16px 0px !important",
@@ -171,6 +170,7 @@ export const WalletSolana: FC<{
             }}
             sx={{
               ...buttonStyles,
+              mb: 2,
             }}
           >
             Get Test SOL
@@ -186,9 +186,11 @@ export const WalletSolana: FC<{
               ? {
                   // background: "#1a1f2e",
                   ...buttonStyles,
+                  mb: 2,
                 }
               : {
                   ...buttonStyles,
+                  mb: 2,
                 }
           }
         >
