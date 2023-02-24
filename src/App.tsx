@@ -131,16 +131,26 @@ function App() {
       />
       <Toaster />
       <Box className="container-page">
-        <img
-          alt="solana"
-          src="./assets/solana.svg"
-          className="chain-container"
-        />
         <span className="join-container">
           {!connection && (
-            <Box sx={{ fontSize: "20px", mb: 4 }}>
-              Please click on the button
-              <br /> below to sign in
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Box sx={{ mb: 4, width: "80%", height: "80%" }}>
+                <img
+                  src="../assets/ludex-logo.svg"
+                  alt="Ludex"
+                  className="logo"
+                />
+              </Box>
+              <Box sx={{ fontSize: "20px", mb: 5 }}>
+                Please click on the button
+                <br /> below to sign in
+              </Box>
             </Box>
           )}
           {provider && viewWallet && connection ? (
@@ -178,37 +188,12 @@ function App() {
               <Box
                 sx={{
                   display: "flex",
-                  flexDirection: "column-reverse",
+                  flexDirection: "column",
                   width: "100%",
                 }}
               >
-                <Button
-                  sx={{
-                    backgroundColor: "#e34d5a",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "10px",
-                    borderRadius: "10px",
-                    marginTop: "1rem",
-                    maxWidth: "290px",
-                    height: "42.25px",
-                    boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
-                    textTransform: "none",
-                    fontWeight: "bold",
-                    "&:hover": {
-                      boxShadow: "none !important",
-                    },
-                  }}
-                  onClick={() => {
-                    logout();
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 1000);
-                  }}
-                >
-                  Logout
-                </Button>
                 <Divider sx={{ mt: 2, mb: 0 }} variant="middle" />
+
                 <Button
                   sx={{
                     backgroundColor: "#ff714f",
@@ -243,6 +228,57 @@ function App() {
                     </Box>
                   </>
                 </Button>
+                <Button
+                  sx={{
+                    backgroundColor: "#e34d5a",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    marginTop: "1rem",
+                    maxWidth: "290px",
+                    height: "42.25px",
+                    boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    "&:hover": {
+                      boxShadow: "none !important",
+                    },
+                  }}
+                  onClick={() => {
+                    logout();
+                    window.location.reload();
+                  }}
+                >
+                  Logout
+                </Button>
+              </Box>
+
+              <Box
+                sx={{
+                  mt: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <Box
+                  sx={{
+                    mb: 1,
+                  }}
+                >
+                  POWERED WITH
+                </Box>
+                <img
+                  alt="solana"
+                  src="./assets/solana-title.svg"
+                  className="chain-container-1"
+                />
+                {/* <img
+              alt="solana"
+              src="./assets/solana.svg"
+              className="chain-container"
+            /> */}
               </Box>
             </>
           )}
