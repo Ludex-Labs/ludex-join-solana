@@ -192,6 +192,35 @@ function App() {
                   width: "100%",
                 }}
               >
+<<<<<<< HEAD
+=======
+                <Button
+                  sx={{
+                    backgroundColor: "#e34d5a",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    marginTop: "1rem",
+                    maxWidth: "290px",
+                    height: "42.25px",
+                    boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    "&:hover": {
+                      boxShadow: "none !important",
+                    },
+                  }}
+                  onClick={() => {
+                    logout();
+                    setTimeout(() => {
+                      window.location.reload();
+                    }, 1000);
+                  }}
+                >
+                  Logout
+                </Button>
+>>>>>>> 77530271047d6966d2b42bafc29eb7c51e5ae5a7
                 <Divider sx={{ mt: 2, mb: 0 }} variant="middle" />
 
                 <Button
