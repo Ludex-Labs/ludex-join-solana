@@ -192,8 +192,6 @@ function App() {
                   width: "100%",
                 }}
               >
-<<<<<<< HEAD
-=======
                 <Button
                   sx={{
                     backgroundColor: "#e34d5a",
@@ -220,7 +218,6 @@ function App() {
                 >
                   Logout
                 </Button>
->>>>>>> 77530271047d6966d2b42bafc29eb7c51e5ae5a7
                 <Divider sx={{ mt: 2, mb: 0 }} variant="middle" />
 
                 <Button
