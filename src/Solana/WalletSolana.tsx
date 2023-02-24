@@ -156,6 +156,7 @@ export const WalletSolana: FC<{
             }}
             sx={{
               ...buttonStyles,
+              mb: 2,
             }}
           >
             Top Up
@@ -184,7 +185,6 @@ export const WalletSolana: FC<{
           sx={
             openMint
               ? {
-                  // background: "#1a1f2e",
                   ...buttonStyles,
                   mb: 2,
                 }
@@ -204,7 +204,6 @@ export const WalletSolana: FC<{
           sx={
             openImportToken
               ? {
-                  // background: "#1a1f2e",
                   ...buttonStyles,
                 }
               : {
@@ -214,17 +213,6 @@ export const WalletSolana: FC<{
         >
           SPL Tokens
         </Button>
-
-        {/* <Button
-          variant="contained"
-          size="small"
-          onClick={() => logout()}
-          sx={{
-            ...buttonStyles,
-          }}
-        >
-          Logout
-        </Button> */}
       </Box>
 
       <Dialog
