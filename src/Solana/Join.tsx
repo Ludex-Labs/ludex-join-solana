@@ -107,7 +107,7 @@ export const Join: FC<{
 
   return (
     <>
-      <Typography variant={"h5"} sx={{ mb: 2 }}>
+      <Typography variant={"h5"} sx={{ mb: 3.5 }}>
         Join Challenge
       </Typography>
       <FormControl disabled={isLoading} fullWidth sx={{ width: "100%", mb: 3 }}>
@@ -172,11 +172,23 @@ export const Join: FC<{
 
       {type === "FT" ? (
         <Button
+          className="join-button"
           fullWidth
           variant="contained"
           size="large"
           disabled={isLoading || challengeAddress.length < 35 || joined}
-          sx={{ mt: 1 }}
+          sx={{
+            backgroundColor: "#3eb718",
+            mt: 1,
+            fontFamily: "Rubik",
+            textTransform: "none",
+            boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+            borderRadius: "8px !important",
+            "&:hover": {
+              boxShadow: "none !important",
+              backgroundColor: "#ff714f14",
+            },
+          }}
           onClick={() => joinFTChallenge()}
         >
           {isLoading ? (
@@ -187,7 +199,7 @@ export const Join: FC<{
               Joined
             </>
           ) : (
-            "JOIN"
+            "Join"
           )}
         </Button>
       ) : (

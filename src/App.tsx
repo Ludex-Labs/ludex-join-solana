@@ -18,7 +18,7 @@ import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
 
 // MUI
 import WalletIcon from "@mui/icons-material/Wallet";
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, Button, Divider } from "@mui/material";
 
 function App() {
   const [viewWallet, setViewWallet] = useState<boolean>(false);
@@ -137,6 +137,12 @@ function App() {
           className="chain-container"
         />
         <span className="join-container">
+          {!connection && (
+            <Box sx={{ fontSize: "20px", mb: 4 }}>
+              Please click on the button
+              <br /> below to sign in
+            </Box>
+          )}
           {provider && viewWallet && connection ? (
             <WalletSolana
               publicKey={wallet?.publicKey?.toString() || ""}
@@ -157,17 +163,88 @@ function App() {
               changeNetwork={changeNetwork}
             />
           ) : (
-            <Button variant={"contained"} size="large" onClick={() => login()}>
+            <Button
+              className="btn-login"
+              variant={"contained"}
+              size="large"
+              onClick={() => login()}
+            >
               Sign In
             </Button>
           )}
-        </span>
 
-        {provider && (
-          <IconButton onClick={() => setViewWallet(!viewWallet)} sx={{ mt: 2 }}>
-            <WalletIcon />
-          </IconButton>
-        )}
+          {provider && (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column-reverse",
+                  width: "100%",
+                }}
+              >
+                <Button
+                  sx={{
+                    backgroundColor: "#e34d5a",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    marginTop: "1rem",
+                    maxWidth: "290px",
+                    height: "42.25px",
+                    boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    "&:hover": {
+                      boxShadow: "none !important",
+                    },
+                  }}
+                  onClick={() => {
+                    logout();
+                    window.location.reload();
+                  }}
+                >
+                  Logout
+                </Button>
+                <Divider sx={{ mt: 2, mb: 0 }} variant="middle" />
+                <Button
+                  sx={{
+                    backgroundColor: "#ff714f",
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "10px",
+                    borderRadius: "10px",
+                    marginTop: "1rem",
+                    maxWidth: "290px",
+                    height: "42.25px",
+                    boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+                    "&:hover": {
+                      boxShadow: "none !important",
+                    },
+                  }}
+                  onClick={() => setViewWallet(!viewWallet)}
+                >
+                  {!viewWallet && (
+                    <WalletIcon sx={{ width: "25px", height: "25px" }} />
+                  )}
+                  <>
+                    <Box
+                      sx={{
+                        fontFamily: "Rubik",
+                        ml: viewWallet ? 0 : "5px",
+                        fontSize: "1rem",
+                        fontWeight: 500,
+                        textTransform: "none",
+                      }}
+                    >
+                      {viewWallet ? "Back" : "Wallet"}
+                    </Box>
+                  </>
+                </Button>
+              </Box>
+            </>
+          )}
+        </span>
       </Box>
     </Box>
   );

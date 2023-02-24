@@ -23,8 +23,24 @@ import {
 } from "@mui/material";
 import NotesIcon from "@mui/icons-material/Notes";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import SendIcon from "@mui/icons-material/Send";
+import SettingsIcon from "@mui/icons-material/Settings";
 import UploadIcon from "@mui/icons-material/Upload";
+
+// Button Style
+const buttonStyles = {
+  textTransform: "none",
+  fontFamily: "Rubik",
+  boxShadow: "#9945ff2e 0px 8px 16px 0px !important",
+  borderRadius: "8px !important",
+  minWidth: "100% !important",
+  background: "linear-gradient(90deg, #9945FF 0%, #14F195 100%) !important",
+  border: "1.5px solid rgba(255, 255, 255, 0.8)",
+  transition: "all 0.3s ease 0s",
+  "&:hover": {
+    boxShadow: "none !important",
+    background: "#374151 !important",
+  },
+};
 
 export const WalletSolana: FC<{
   provider: SafeEventEmitterProvider | null;
@@ -56,7 +72,11 @@ export const WalletSolana: FC<{
     }
     const rpc = new RPC(provider);
     const _balance = await rpc.getBalance(connection);
-    setBalance(parseInt(_balance) / 10 ** 9);
+    if (_balance?.toString().includes("Error")) {
+      toast.error("Error getting balance");
+      setBalance(0);
+      return;
+    } else setBalance(parseInt(_balance) / 10 ** 9);
   };
 
   useEffect(() => {
@@ -66,7 +86,7 @@ export const WalletSolana: FC<{
 
   return (
     <>
-      <Typography variant={"h5"} sx={{ mb: 2 }}>
+      <Typography variant={"h5"} sx={{ mb: 3.5 }}>
         Your Wallet
       </Typography>
       <FormControl fullWidth sx={{ width: "100%", mb: 2 }}>
@@ -77,8 +97,7 @@ export const WalletSolana: FC<{
           disabled
           endAdornment={
             <InputAdornment position="end">
-              <Button
-                variant="contained"
+              <IconButton
                 onClick={() => {
                   window.open(
                     "https://solana.tor.us/wallet/transfer?instanceId=" +
@@ -88,8 +107,8 @@ export const WalletSolana: FC<{
                   );
                 }}
               >
-                <SendIcon />
-              </Button>
+                <SettingsIcon />
+              </IconButton>
             </InputAdornment>
           }
           fullWidth
@@ -102,24 +121,11 @@ export const WalletSolana: FC<{
           value={balance?.toString() + " SOL"}
           label="Wallet"
           disabled
-          endAdornment={
-            <InputAdornment position="end">
-              <Button
-                variant="contained"
-                disabled={balance === undefined}
-                onClick={() => {
-                  getBalance();
-                }}
-              >
-                <RefreshIcon />
-              </Button>
-            </InputAdornment>
-          }
           fullWidth
         />
       </FormControl>
 
-      <FormControl fullWidth sx={{ mb: 3 }}>
+      <FormControl fullWidth sx={{ mb: 2 }}>
         <InputLabel>Network</InputLabel>
         <Select
           value={isMainnet ? "mainnet" : "devnet"}
@@ -148,7 +154,10 @@ export const WalletSolana: FC<{
                 "popup=true,height=600,width=400"
               );
             }}
-            style={{ margin: 5 }}
+            sx={{
+              ...buttonStyles,
+              mb: 2,
+            }}
           >
             Top Up
           </Button>
@@ -156,8 +165,14 @@ export const WalletSolana: FC<{
           <Button
             variant="contained"
             size="small"
-            onClick={() => getTestSol(publicKey)}
-            style={{ margin: 5 }}
+            onClick={async () => {
+              await getTestSol(publicKey);
+              getBalance();
+            }}
+            sx={{
+              ...buttonStyles,
+              mb: 2,
+            }}
           >
             Get Test SOL
           </Button>
@@ -167,8 +182,17 @@ export const WalletSolana: FC<{
           variant="contained"
           size="small"
           onClick={() => setOpenMint(!openMint)}
-          sx={openMint ? { background: "#1a1f2e" } : {}}
-          style={{ margin: 5 }}
+          sx={
+            openMint
+              ? {
+                  ...buttonStyles,
+                  mb: 2,
+                }
+              : {
+                  ...buttonStyles,
+                  mb: 2,
+                }
+          }
         >
           Mint Test NFT
         </Button>
@@ -177,19 +201,17 @@ export const WalletSolana: FC<{
           variant="contained"
           size="small"
           onClick={() => setOpenImportToken(!openImportToken)}
-          sx={openImportToken ? { background: "#1a1f2e" } : {}}
-          style={{ margin: 5 }}
+          sx={
+            openImportToken
+              ? {
+                  ...buttonStyles,
+                }
+              : {
+                  ...buttonStyles,
+                }
+          }
         >
           SPL Tokens
-        </Button>
-
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => logout()}
-          style={{ margin: 5 }}
-        >
-          Logout
         </Button>
       </Box>
 
@@ -198,7 +220,11 @@ export const WalletSolana: FC<{
         onClose={() => setOpenImportToken(false)}
         open={openImportToken}
       >
-        <DialogTitle sx={{ textAlign: "center" }}>SPL Tokens</DialogTitle>
+        <DialogTitle
+          sx={{ textAlign: "center", fontFamily: "Rubik", fontWeight: 400 }}
+        >
+          SPL Tokens
+        </DialogTitle>
         <Box>
           <FormControl fullWidth>
             <InputLabel>Import Token</InputLabel>

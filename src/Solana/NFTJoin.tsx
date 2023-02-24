@@ -231,13 +231,15 @@ export const NFTJoin: FC<{
     setOpenOffering(true);
   };
 
+  console.log(playerStatus);
+
   return (
     <>
       <Button
+        className="join-button"
         fullWidth
-        variant="contained"
         size="large"
-        sx={{ mt: 1 }}
+        variant="contained"
         onClick={() => joinNFTChallenge()}
         disabled={
           isLoading ||
@@ -245,6 +247,18 @@ export const NFTJoin: FC<{
           playerStatus === "JOINED" ||
           playerStatus === "ACCEPTED"
         }
+        sx={{
+          backgroundColor: "#3eb718",
+          mt: 1,
+          fontFamily: "Rubik",
+          textTransform: "none",
+          boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+          borderRadius: "10px !important",
+          "&:hover": {
+            boxShadow: "none !important",
+            backgroundColor: "#ff714f14",
+          },
+        }}
       >
         {playerStatus === "JOINED" || playerStatus === "ACCEPTED" ? (
           <>
@@ -255,98 +269,125 @@ export const NFTJoin: FC<{
           "Join"
         )}
       </Button>
+      {(playerStatus === "JOINED" || playerStatus === "ACCEPTED") && (
+        <>
+          <FormControl fullWidth sx={{ mb: 1, mt: 4 }}>
+            <InputLabel>Offerings</InputLabel>
+            <Select
+              multiple
+              native
+              label="Native"
+              disabled={isLoading || challengeAddress.length !== 44}
+              value={[selectedOffering]}
+              sx={{
+                borderBottomRightRadius: 0,
+                borderBottomLeftRadius: 0,
+                overflow: "auto",
+              }}
+            >
+              {offerings.length > 0 ? (
+                offerings.map((offering: any, i: number) => {
+                  return (
+                    <option
+                      key={i}
+                      value={offering.name}
+                      onClick={() => onClickOffering(offering)}
+                      style={{
+                        padding: 5,
+                        borderBottom: "1px solid #646567",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {offering.name}
+                    </option>
+                  );
+                })
+              ) : (
+                <option>No offerings yet.</option>
+              )}
+            </Select>
 
-      <FormControl fullWidth sx={{ mb: 0, mt: 4 }}>
-        <InputLabel>Offerings</InputLabel>
-        <Select
-          multiple
-          native
-          label="Native"
-          disabled={isLoading || challengeAddress.length !== 44}
-          value={[selectedOffering]}
-          sx={{
-            borderBottomRightRadius: 0,
-            borderBottomLeftRadius: 0,
-            overflow: "auto",
-          }}
-        >
-          {offerings.length > 0 ? (
-            offerings.map((offering: any, i: number) => {
-              return (
-                <option
-                  key={i}
-                  value={offering.name}
-                  onClick={() => onClickOffering(offering)}
-                  style={{
-                    padding: 5,
-                    borderBottom: "1px solid #646567",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {offering.name}
-                </option>
-              );
-            })
-          ) : (
-            <option>No offerings yet.</option>
-          )}
-        </Select>
+            <IconButton
+              onClick={() => {
+                toast.success("Refreshing offerings...");
+                getOfferings();
+              }}
+              sx={{
+                position: "absolute",
+                right: 0,
+                marginRight: "5px",
+                marginTop: "2px",
+                minWidth: "5px",
+              }}
+            >
+              <RefreshIcon />
+            </IconButton>
+          </FormControl>
+          <Button
+            className="join-button"
+            onClick={() => setOpen(!open)}
+            fullWidth
+            variant="contained"
+            size="large"
+            disabled={
+              isLoading ||
+              accepted ||
+              challengeAddress.length !== 44 ||
+              playerStatus === "ACCEPTED"
+            }
+            sx={{
+              backgroundColor: "#349bc6",
+              mt: 1,
+              fontFamily: "Rubik",
+              textTransform: "none",
+              boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
+              borderRadius: "10px !important",
+              "&:hover": {
+                boxShadow: "none !important",
+                backgroundColor: "#ff714f14",
+              },
+            }}
+          >
+            Add Offering
+          </Button>
 
-        <IconButton
-          onClick={() => {
-            toast.success("Refreshing offerings...");
-            getOfferings();
-          }}
-          sx={{
-            position: "absolute",
-            right: 0,
-            marginRight: "5px",
-            marginTop: "2px",
-            minWidth: "5px",
-          }}
-        >
-          <RefreshIcon />
-        </IconButton>
-      </FormControl>
-      <Button
-        onClick={() => setOpen(!open)}
-        fullWidth
-        variant="contained"
-        sx={{ mb: 1, borderTopRightRadius: 0, borderTopLeftRadius: 0 }}
-        disabled={
-          isLoading ||
-          accepted ||
-          challengeAddress.length !== 44 ||
-          playerStatus === "ACCEPTED" ||
-          playerStatus === "NOT_IN_GAME"
-        }
-      >
-        Add Offering
-      </Button>
-
-      <Button
-        fullWidth
-        variant="contained"
-        onClick={() => acceptOffering()}
-        size="large"
-        disabled={
-          isLoading ||
-          accepted ||
-          challengeAddress.length !== 44 ||
-          playerStatus === "ACCEPTED" ||
-          playerStatus === "NOT_IN_GAME"
-        }
-      >
-        {playerStatus !== "ACCEPTED" ? (
-          "ACCEPT"
-        ) : (
-          <>
-            <CheckCircleOutlineIcon sx={{ mr: 1 }} />
-            ACCEPTED
-          </>
-        )}
-      </Button>
+          <Button
+            className="join-button"
+            fullWidth
+            variant="contained"
+            onClick={() => acceptOffering()}
+            size="large"
+            disabled={
+              isLoading ||
+              accepted ||
+              challengeAddress.length !== 44 ||
+              playerStatus === "ACCEPTED"
+            }
+            sx={{
+              backgroundColor: "#3eb718",
+              mt: 2,
+              fontFamily: "Rubik",
+              textTransform: "none",
+              boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+              borderRadius: "10px !important",
+              "&:hover": {
+                boxShadow: "none !important",
+                backgroundColor: "#ff714f14",
+              },
+            }}
+          >
+            {playerStatus !== "ACCEPTED" ? (
+              "Accept"
+            ) : (
+              <>
+                <CheckCircleOutlineIcon sx={{ mr: 1 }} />
+                Accepted
+              </>
+            )}
+          </Button>
+        </>
+      )}
 
       <Dialog
         className="dark-dialog-slim"

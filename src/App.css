@@ -3,7 +3,11 @@
 
 body {
   color: #fff;
-  font-family: Rubik, Inter, sans-serif;
+  font-family: Rubik, Inter, sans-serif !important;
+}
+
+h5 {
+  font-family: Rubik, Inter, sans-serif !important;
 }
 
 a {
@@ -28,6 +32,10 @@ a {
 .container-page {
   z-index: 1;
   max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 #w3a-modal {
@@ -36,20 +44,22 @@ a {
 
 .join-container {
   background: #374151;
-  border-radius: 32px;
+  border-radius: 15px;
   padding: 30px;
-  min-width: 350px;
+  width: 317px;
+  /* max-width: 350px; */
   min-height: 300px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .chain-container {
   height: 35px;
   width: 35px;
-  margin-bottom: 3px;
+  margin-bottom: 1rem;
   transform: translatey(0px);
   animation: float 4s ease-in-out infinite;
 }
@@ -75,9 +85,10 @@ a {
 
 .dark-dialog .MuiPaper-root {
   background: #374151;
-  border-radius: 32px;
+  border-radius: 15px;
   padding: 30px;
   padding-top: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .dark-dialog-slim .MuiBackdrop-root {
@@ -91,4 +102,15 @@ a {
 
 .MuiNativeSelect-select {
   overflow: auto;
+}
+
+.btn-login {
+  font-family: Rubik, Inter, sans-serif !important;
+  box-shadow: #ff714f3d 0px 8px 16px 0px !important;
+  border-radius: 8px !important;
+  text-transform: none !important;
+}
+
+.join-button:disabled {
+  box-shadow: none !important;
 }
