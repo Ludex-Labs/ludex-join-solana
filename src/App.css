@@ -64,6 +64,11 @@ a {
   animation: float 4s ease-in-out infinite;
 }
 
+.chain-container-1 {
+  height: 80%;
+  width: 80%;
+}
+
 @keyframes float {
   0% {
     box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.6);
