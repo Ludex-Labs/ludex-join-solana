@@ -38,7 +38,7 @@ export const Join: FC<{
   const [joined, setJoined] = useState<boolean>(false);
   const [challengeAddress, setChallengeAddress] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [viewOfferings, setViewOfferings] = useState<boolean>(true);
+  const [viewOfferings, setViewOfferings] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
