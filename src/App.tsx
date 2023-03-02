@@ -161,7 +161,6 @@ function App() {
               isMainnet={isMainnet}
               connection={connection}
               changeNetwork={changeNetwork}
-              logout={logout}
             />
           ) : provider && connection != null ? (
             <Join
@@ -219,7 +218,7 @@ function App() {
                       sx={{
                         fontFamily: "Rubik",
                         ml: viewWallet ? 0 : "5px",
-                        fontSize: "1rem",
+                        fontSize: "15px",
                         fontWeight: 500,
                         textTransform: "none",
                       }}

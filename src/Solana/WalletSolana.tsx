@@ -48,17 +48,9 @@ export const WalletSolana: FC<{
   connection: Connection;
   wallet: Wallet | undefined;
   changeNetwork: (network: string) => void;
-  logout: () => void;
 }> = (props) => {
-  const {
-    provider,
-    publicKey,
-    isMainnet,
-    connection,
-    wallet,
-    changeNetwork,
-    logout,
-  } = props;
+  const { provider, publicKey, isMainnet, connection, wallet, changeNetwork } =
+    props;
   const [balance, setBalance] = useState<number | undefined>(undefined);
   const [openMint, setOpenMint] = useState(false);
   const [openImportToken, setOpenImportToken] = useState(false);

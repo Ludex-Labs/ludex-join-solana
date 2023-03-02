@@ -38,6 +38,7 @@ export const Join: FC<{
   const [joined, setJoined] = useState<boolean>(false);
   const [challengeAddress, setChallengeAddress] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [viewOfferings, setViewOfferings] = useState<boolean>(true);
 
   useEffect(() => {
     (async () => {
@@ -109,68 +110,76 @@ export const Join: FC<{
 
   return (
     <>
-      <Typography variant={"h5"} sx={{ mb: 3.5 }}>
-        Join Challenge
-      </Typography>
-      <FormControl disabled={isLoading} fullWidth sx={{ width: "100%", mb: 3 }}>
-        <InputLabel>Challenge Address</InputLabel>
-        <OutlinedInput
-          onChange={(e) => setChallengeAddress(e.currentTarget.value)}
-          value={challengeAddress}
-          label="Challenge Address"
-          disabled={joined}
-          fullWidth
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                disabled={challengeAddress === ""}
-                onClick={() =>
-                  window.open(
-                    "https://solscan.io/account/" +
-                      challengeAddress +
-                      `?cluster=${isMainnet ? "mainnet" : "devnet"}`,
-                    "_blank"
-                  )
-                }
-              >
-                <DescriptionIcon />
-              </IconButton>
-            </InputAdornment>
-          }
-        />
-      </FormControl>
+      {!viewOfferings && (
+        <>
+          <Typography variant={"h5"} sx={{ mb: 3.5 }}>
+            Join Challenge
+          </Typography>
+          <FormControl
+            disabled={isLoading}
+            fullWidth
+            sx={{ width: "100%", mb: 2 }}
+          >
+            <InputLabel>Challenge Address</InputLabel>
+            <OutlinedInput
+              onChange={(e) => setChallengeAddress(e.currentTarget.value)}
+              value={challengeAddress}
+              label="Challenge Address"
+              disabled={joined}
+              fullWidth
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    disabled={challengeAddress === ""}
+                    onClick={() =>
+                      window.open(
+                        "https://solscan.io/account/" +
+                          challengeAddress +
+                          `?cluster=${isMainnet ? "mainnet" : "devnet"}`,
+                        "_blank"
+                      )
+                    }
+                  >
+                    <DescriptionIcon />
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+          </FormControl>
 
-      <FormControl fullWidth sx={{ mb: 3 }}>
-        <InputLabel>Network</InputLabel>
-        <Select
-          value={isMainnet ? "mainnet" : "devnet"}
-          disabled={joined || isLoading}
-          label="Network"
-          onChange={(e) =>
-            e.target.value === "mainnet"
-              ? changeNetwork("mainnet")
-              : changeNetwork("devnet")
-          }
-        >
-          <MenuItem value={"devnet"}>Devnet</MenuItem>
-          <MenuItem value={"mainnet"}>Mainnet</MenuItem>
-        </Select>
-      </FormControl>
+          <FormControl size="small" fullWidth sx={{ mb: 2 }}>
+            <InputLabel>Network</InputLabel>
+            <Select
+              value={isMainnet ? "mainnet" : "devnet"}
+              disabled={joined || isLoading}
+              label="Network"
+              onChange={(e) =>
+                e.target.value === "mainnet"
+                  ? changeNetwork("mainnet")
+                  : changeNetwork("devnet")
+              }
+            >
+              <MenuItem value={"devnet"}>Devnet</MenuItem>
+              <MenuItem value={"mainnet"}>Mainnet</MenuItem>
+            </Select>
+          </FormControl>
 
-      <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel>Type</InputLabel>
-        <Select
-          value={type === "FT" ? "FT" : "NFT"}
-          disabled={joined || isLoading}
-          label="Type"
-          onChange={(e) =>
-            e.target.value === "FT" ? setType("FT") : setType("NFT")
-          }
-        >
-          <MenuItem value={"FT"}>Fungible Token</MenuItem>
-          <MenuItem value={"NFT"}>Non-Fungible Token</MenuItem>
-        </Select>
-      </FormControl>
+          <FormControl size="small" fullWidth sx={{ mb: 2 }}>
+            <InputLabel>Type</InputLabel>
+            <Select
+              value={type === "FT" ? "FT" : "NFT"}
+              disabled={joined || isLoading}
+              label="Type"
+              onChange={(e) =>
+                e.target.value === "FT" ? setType("FT") : setType("NFT")
+              }
+            >
+              <MenuItem value={"FT"}>Fungible Token</MenuItem>
+              <MenuItem value={"NFT"}>Non-Fungible Token</MenuItem>
+            </Select>
+          </FormControl>
+        </>
+      )}
 
       {type === "FT" ? (
         <Button
@@ -213,7 +222,8 @@ export const Join: FC<{
           challengeAddress={challengeAddress}
           connection={connection}
           isLoading={isLoading}
-          setIsLoading={setIsLoading}
+          viewOfferings={viewOfferings}
+          setViewOfferings={setViewOfferings}
         />
       )}
     </>
