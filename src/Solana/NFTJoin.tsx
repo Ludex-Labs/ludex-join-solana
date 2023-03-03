@@ -88,6 +88,7 @@ export const NFTJoin: FC<{
   const [accepted, setAccepted] = useState<boolean>(false);
   const [playerStatus, setPlayerStatus] = useState<string>("");
   const [escrowless, setEscrowless] = useState<boolean>(false);
+  const [tokenAccount, setTokenAccount] = useState<string>();
 
   useEffect(() => {
     if (challengeAddress.length !== 44) return;
@@ -169,8 +170,15 @@ export const NFTJoin: FC<{
     var tx: Transaction | undefined;
     if (type === "SOL") {
       tx = await ludexTx.addSolOffering(publicKey, amount).getTx();
-    } else if (type === "NFT") {
-      tx = await ludexTx.addNftOffering(publicKey, NFTmint, 1).getTx();
+    } else if (type === "NFT" && !escrowless) {
+      tx = await ludexTx
+        .addEscrowedOffering(publicKey, NFTmint, 1, tokenAccount)
+        .getTx();
+    } else if (type === "NFT" && escrowless) {
+      // Only works for Metaplex NFTs
+      tx = await ludexTx
+        .addEscrowlessOffering(publicKey, NFTmint, tokenAccount)
+        .getTx();
     } else throw new Error("Invalid offering type");
     const result = await connection.getLatestBlockhash();
     tx.recentBlockhash = result.blockhash;
@@ -499,6 +507,15 @@ export const NFTJoin: FC<{
               label="NFT Mint Address"
               value={NFTmint}
               onChange={(e) => setNFTmint(e.currentTarget.value)}
+              sx={{ mb: 2 }}
+            />
+
+            <TextField
+              size="small"
+              fullWidth
+              label="Token Account"
+              value={tokenAccount}
+              onChange={(e) => setTokenAccount(e.currentTarget.value)}
             />
 
             <FormGroup>
