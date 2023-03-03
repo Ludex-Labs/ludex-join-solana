@@ -79,7 +79,7 @@ export const NFTJoin: FC<{
     setViewOfferings,
   } = props;
   const [open, setOpen] = useState<boolean>(false);
-  const [NFTmint, setNFTmint] = useState<string>("");
+  const [mint, setMint] = useState<string>("");
   const [amount, setAmount] = useState<number>(0.001);
   const [selectedOffering, setSelectedOffering] =
     useState<DeserialziedOffering | null>(null);
@@ -88,7 +88,7 @@ export const NFTJoin: FC<{
   const [accepted, setAccepted] = useState<boolean>(false);
   const [playerStatus, setPlayerStatus] = useState<string>("");
   const [escrowless, setEscrowless] = useState<boolean>(false);
-  const [tokenAccount, setTokenAccount] = useState<string>();
+  const [tokenAmount, setTokenAmount] = useState<number>(1);
 
   useEffect(() => {
     if (challengeAddress.length !== 44) return;
@@ -172,13 +172,10 @@ export const NFTJoin: FC<{
       tx = await ludexTx.addSolOffering(publicKey, amount).getTx();
     } else if (type === "NFT" && !escrowless) {
       tx = await ludexTx
-        .addEscrowedOffering(publicKey, NFTmint, 1, tokenAccount)
+        .addEscrowedOffering(publicKey, mint, tokenAmount)
         .getTx();
     } else if (type === "NFT" && escrowless) {
-      // Only works for Metaplex NFTs
-      tx = await ludexTx
-        .addEscrowlessOffering(publicKey, NFTmint, tokenAccount)
-        .getTx();
+      tx = await ludexTx.addEscrowlessOffering(publicKey, mint).getTx();
     } else throw new Error("Invalid offering type");
     const result = await connection.getLatestBlockhash();
     tx.recentBlockhash = result.blockhash;
@@ -187,7 +184,7 @@ export const NFTJoin: FC<{
     const res = await sendTransaction(tx);
     if (res.toString().includes("Error")) return;
     toast.success("Offering added!");
-    setNFTmint("");
+    setMint("");
     setOpen(false);
     console.info("sig: ", res);
   };
@@ -504,23 +501,26 @@ export const NFTJoin: FC<{
             <TextField
               size="small"
               fullWidth
-              label="NFT Mint Address"
-              value={NFTmint}
-              onChange={(e) => setNFTmint(e.currentTarget.value)}
+              label="Mint Address"
+              value={mint}
+              onChange={(e) => setMint(e.currentTarget.value)}
               sx={{ mb: 2 }}
             />
 
-            <TextField
-              size="small"
-              fullWidth
-              label="Token Account"
-              value={tokenAccount}
-              onChange={(e) => setTokenAccount(e.currentTarget.value)}
-            />
+            {!escrowless && (
+              <TextField
+                size="small"
+                fullWidth
+                label="Token Amount"
+                type="number"
+                value={tokenAmount}
+                onChange={(e) => setAmount(parseInt(e.currentTarget.value))}
+              />
+            )}
 
             <FormGroup>
               <FormControlLabel
-                label="Escrowless"
+                label="Escrowless (Metaplex NFTs only)"
                 control={
                   <Checkbox
                     checked={escrowless}
@@ -534,10 +534,10 @@ export const NFTJoin: FC<{
               fullWidth
               variant="contained"
               onClick={() => addOffering("NFT")}
-              disabled={isLoading || NFTmint?.length !== 44}
+              disabled={isLoading || mint?.length !== 44}
               sx={{ mb: 2 }}
             >
-              Add NFT Offering
+              Add Token Offering
             </Button>
           </Box>
         </Box>

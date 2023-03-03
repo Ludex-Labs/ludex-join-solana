@@ -246,7 +246,6 @@ function App() {
                   }}
                   onClick={() => {
                     logout();
-                    window.location.reload();
                   }}
                 >
                   Logout
