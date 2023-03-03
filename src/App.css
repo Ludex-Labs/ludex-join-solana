@@ -65,8 +65,8 @@ a {
 }
 
 .chain-container-1 {
-  height: 80%;
-  width: 80%;
+  height: auto;
+  width: 175px;
 }
 
 @keyframes float {

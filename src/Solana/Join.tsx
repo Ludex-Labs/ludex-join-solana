@@ -108,11 +108,38 @@ export const Join: FC<{
         console.info("sig: ", res);
       }
     } catch (error) {
+      console.error(error);
       if (error?.toString().includes("Invalid account discriminator")) {
-        console.error(error);
         toast.error("Join failed... challenge details invalid");
       } else if (error?.toString().includes("Error")) {
-        console.error(error);
+        toast.error("Join challenge failed");
+      }
+    }
+  };
+
+  const leaveFTChallenge = async () => {
+    if (!wallet) return;
+    try {
+      const ludexTx = new Challenge.ChallengeTXClient(
+        connection,
+        challengeAddress,
+        {
+          wallet: wallet,
+          cluster: isMainnet ? "MAINNET" : "DEVNET",
+        }
+      );
+      const tx = await ludexTx.leave(wallet.publicKey.toBase58()).getTx();
+      const result = connection.getLatestBlockhash();
+      tx.recentBlockhash = (await result).blockhash;
+      const res = await sendTransaction(tx);
+      if (!res.toString().includes("Error")) {
+        setJoined(true);
+        toast.success("Challenge joined!");
+        console.info("sig: ", res);
+      }
+    } catch (error) {
+      console.error(error);
+      if (error?.toString().includes("Error")) {
         toast.error("Join challenge failed");
       }
     }
@@ -192,37 +219,63 @@ export const Join: FC<{
       )}
 
       {type === "FT" ? (
-        <Button
-          className="join-button"
-          fullWidth
-          variant="contained"
-          size="large"
-          disabled={isLoading || challengeAddress.length < 35 || joined}
-          sx={{
-            backgroundColor: "#3eb718",
-            mt: 1,
-            fontFamily: "Rubik",
-            textTransform: "none",
-            boxShadow: "#3eb71870 0px 8px 16px 0px!important",
-            borderRadius: "8px !important",
-            "&:hover": {
-              boxShadow: "none !important",
-              backgroundColor: "#ff714f14",
-            },
-          }}
-          onClick={() => joinFTChallenge()}
-        >
-          {isLoading ? (
-            <CircularProgress size={24} />
-          ) : joined ? (
-            <>
-              <CheckCircleOutlineIcon sx={{ mr: 1 }} />
-              Joined
-            </>
-          ) : (
-            "Join"
+        <>
+          <Button
+            className="join-button"
+            fullWidth
+            variant="contained"
+            size="large"
+            disabled={isLoading || challengeAddress.length < 35 || joined}
+            sx={{
+              backgroundColor: "#3eb718",
+              mt: 1,
+              fontFamily: "Rubik",
+              textTransform: "none",
+              boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+              borderRadius: "8px !important",
+              "&:hover": {
+                boxShadow: "none !important",
+                backgroundColor: "#ff714f14",
+              },
+            }}
+            onClick={() => joinFTChallenge()}
+          >
+            {isLoading ? (
+              <CircularProgress size={24} />
+            ) : joined ? (
+              <>
+                <CheckCircleOutlineIcon sx={{ mr: 1 }} />
+                Joined
+              </>
+            ) : (
+              "Join"
+            )}
+          </Button>
+          {joined && (
+            <Button
+              className="join-button"
+              fullWidth
+              variant="contained"
+              size="large"
+              disabled={isLoading || challengeAddress.length < 35}
+              sx={{
+                backgroundColor: "#3eb718",
+                mt: 1,
+                fontFamily: "Rubik",
+                textTransform: "none",
+                boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+                borderRadius: "8px !important",
+                "&:hover": {
+                  boxShadow: "none !important",
+                  backgroundColor: "#ff714f14",
+                },
+              }}
+              onClick={() => leaveFTChallenge()}
+            >
+              Leave
+            </Button>
           )}
-        </Button>
+        </>
       ) : (
         <NFTJoin
           publicKey={publicKey}

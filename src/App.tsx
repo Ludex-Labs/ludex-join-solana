@@ -140,14 +140,14 @@ function App() {
                 alignItems: "center",
               }}
             >
-              <Box sx={{ mb: 4, width: "80%", height: "80%" }}>
+              <Box sx={{ mb: 3, width: "80%", height: "80%" }}>
                 <img
                   src="../assets/ludex-logo.svg"
                   alt="Ludex"
                   className="logo"
                 />
               </Box>
-              <Box sx={{ fontSize: "20px", mb: 5 }}>
+              <Box sx={{ fontSize: "20px", mb: 3 }}>
                 Please click on the button
                 <br /> below to sign in
               </Box>
@@ -255,7 +255,7 @@ function App() {
 
               <Box
                 sx={{
-                  mt: 2,
+                  mt: 3,
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -273,11 +273,6 @@ function App() {
                   src="./assets/solana-title.svg"
                   className="chain-container-1"
                 />
-                {/* <img
-              alt="solana"
-              src="./assets/solana.svg"
-              className="chain-container"
-            /> */}
               </Box>
             </>
           )}
