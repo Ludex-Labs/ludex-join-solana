@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
+import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
 import { Connection } from "@solana/web3.js";
 import { SafeEventEmitterProvider } from "@web3auth/base";
 import { NFTMint } from "./NFTMint";

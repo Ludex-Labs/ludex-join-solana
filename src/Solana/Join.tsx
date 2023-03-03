@@ -2,7 +2,7 @@
 import { FC, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Challenge } from "@ludex-labs/ludex-sdk-js";
-import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
+import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
 import { Connection, Transaction } from "@solana/web3.js";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { SafeEventEmitterProvider } from "@web3auth/base";

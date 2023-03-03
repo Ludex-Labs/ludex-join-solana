@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { NFTChallenge } from "@ludex-labs/ludex-sdk-js";
-import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
+import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
 import { guestIdentity, Metaplex } from "@metaplex-foundation/js";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -514,7 +514,9 @@ export const NFTJoin: FC<{
                 label="Token Amount"
                 type="number"
                 value={tokenAmount}
-                onChange={(e) => setAmount(parseInt(e.currentTarget.value))}
+                onChange={(e) =>
+                  setTokenAmount(parseInt(e.currentTarget.value))
+                }
               />
             )}
 

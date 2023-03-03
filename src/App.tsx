@@ -6,7 +6,7 @@ import { Join } from "./Solana/Join";
 import { RPC } from "./Solana/RPC";
 import { WalletSolana } from "./Solana/WalletSolana";
 import { Connection } from "@solana/web3.js";
-import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
+import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
 
 // @ts-ignore
 import StarfieldAnimation from "react-starfield-animation";
