@@ -89,22 +89,32 @@ export const Join: FC<{
 
   const joinFTChallenge = async () => {
     if (!wallet) return;
-    const ludexTx = new Challenge.ChallengeTXClient(
-      connection,
-      challengeAddress,
-      {
-        wallet: wallet,
-        cluster: isMainnet ? "MAINNET" : "DEVNET",
+    try {
+      const ludexTx = new Challenge.ChallengeTXClient(
+        connection,
+        challengeAddress,
+        {
+          wallet: wallet,
+          cluster: isMainnet ? "MAINNET" : "DEVNET",
+        }
+      );
+      const tx = await ludexTx.join(wallet.publicKey.toBase58()).getTx();
+      const result = connection.getLatestBlockhash();
+      tx.recentBlockhash = (await result).blockhash;
+      const res = await sendTransaction(tx);
+      if (!res.toString().includes("Error")) {
+        setJoined(true);
+        toast.success("Challenge joined!");
+        console.info("sig: ", res);
       }
-    );
-    const tx = await ludexTx.join(wallet.publicKey.toBase58()).getTx();
-    const result = connection.getLatestBlockhash();
-    tx.recentBlockhash = (await result).blockhash;
-    const res = await sendTransaction(tx);
-    if (!res.toString().includes("Error")) {
-      setJoined(true);
-      toast.success("Challenge joined!");
-      console.info("sig: ", res);
+    } catch (error) {
+      if (error?.toString().includes("Invalid account discriminator")) {
+        console.error(error);
+        toast.error("Join failed... challenge details invalid");
+      } else if (error?.toString().includes("Error")) {
+        console.error(error);
+        toast.error("Join challenge failed");
+      }
     }
   };
 
