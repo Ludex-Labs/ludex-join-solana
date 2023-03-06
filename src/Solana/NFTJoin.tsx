@@ -233,6 +233,8 @@ export const NFTJoin: FC<{
 
   console.log(playerStatus);
 
+  const isButtonDisabled = isLoading || NFTmint?.length !== 44;
+
   return (
     <>
       <Button
@@ -400,7 +402,7 @@ export const NFTJoin: FC<{
           }}
         >
           <DialogTitle
-            sx={{ color: "white", textAlign: "center", fontWeight: 500 }}
+            sx={{ color: "white", textAlign: "center", fontWeight: 400, mb: 2 }}
           >
             Add Offering
           </DialogTitle>
@@ -431,7 +433,24 @@ export const NFTJoin: FC<{
               fullWidth
               size="small"
               variant="contained"
-              sx={{ mb: 2 }}
+              sx={{
+                backgroundColor: "#ff714f",
+                display: "flex",
+                alignItems: "center",
+                padding: "10px",
+                borderRadius: "10px",
+                marginTop: "1rem",
+                maxWidth: "290px",
+                height: "42.25px",
+                boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+                textTransform: "none",
+                fontFamily: "Rubik",
+                fontWeight: 500,
+                mb: 2,
+                "&:hover": {
+                  boxShadow: "none !important",
+                },
+              }}
               onClick={() => addOffering("SOL")}
               disabled={isLoading || amount === 0}
             >
@@ -452,6 +471,9 @@ export const NFTJoin: FC<{
 
             <FormGroup>
               <FormControlLabel
+                sx={{
+                  mt: 2,
+                }}
                 label="Escrowless"
                 control={
                   <Checkbox
@@ -466,8 +488,29 @@ export const NFTJoin: FC<{
               fullWidth
               variant="contained"
               onClick={() => addOffering("NFT")}
-              disabled={isLoading || NFTmint?.length !== 44}
-              sx={{ mb: 2 }}
+              disabled={isButtonDisabled}
+              sx={{
+                backgroundColor: "#ff714f",
+                display: "flex",
+                alignItems: "center",
+                padding: "10px",
+                borderRadius: "10px",
+                marginTop: "1rem",
+                maxWidth: "290px",
+                height: "42.25px",
+                boxShadow: isButtonDisabled
+                  ? "none !important"
+                  : "#ff714f3d 0px 8px 16px 0px !important",
+                textTransform: "none",
+                fontFamily: "Rubik",
+                fontWeight: 500,
+                mb: 2,
+                "&:hover": {
+                  boxShadow: isButtonDisabled
+                    ? "none !important"
+                    : "#ff714f3d 0px 8px 16px 0px !important",
+                },
+              }}
             >
               Add NFT Offering
             </Button>

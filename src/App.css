@@ -102,7 +102,8 @@ a {
 
 .dark-dialog-slim .MuiPaper-root {
   background: #374151;
-  border-radius: 32px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .MuiNativeSelect-select {
