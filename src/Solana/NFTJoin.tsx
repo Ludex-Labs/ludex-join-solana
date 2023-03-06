@@ -22,7 +22,6 @@ import {
   InputAdornment,
   InputLabel,
   OutlinedInput,
-  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -132,22 +131,38 @@ export const NFTJoin: FC<{
         challengeAddress
       );
 
-      const offerings = _offerings.map((offering: Offering) => {
-        return {
-          amount: offering?.account?.amount?.toNumber() / LAMPORTS_PER_SOL,
-          isEscrowed: offering?.account.isEscrowed,
-          publicKey: offering?.publicKey?.toBase58(),
-          authority: offering?.authority ? offering?.authority?.toBase58() : "",
-          metadata: null,
-          _mint: offering?.account?.mint ? offering?.account?.mint : null,
-          mint: offering?.account?.mint
-            ? offering?.account?.mint?.toBase58()
-            : null,
-          name: offering?.account?.mint
-            ? "NFT - " + offering?.account?.mint?.toBase58()
-            : offering?.account?.amount?.toNumber() / LAMPORTS_PER_SOL + " SOL",
-        };
-      });
+      const offerings: DeserialziedOffering[] = [];
+
+      await Promise.all(
+        _offerings.map(async (offering: Offering) => {
+          let metadata: any = null;
+          if (offering?.account?.mint) {
+            const mx = await Metaplex.make(connection).use(guestIdentity());
+            const nft = await mx
+              .nfts()
+              .findByMint({ mintAddress: offering?.account?.mint });
+            const response = await fetch(nft?.uri);
+            metadata = await response.json();
+          }
+          offerings.push({
+            amount: offering?.account?.amount?.toNumber() / LAMPORTS_PER_SOL,
+            isEscrowed: offering?.account.isEscrowed,
+            publicKey: offering?.publicKey?.toBase58(),
+            authority: offering?.authority
+              ? offering?.authority?.toBase58()
+              : "",
+            metadata: metadata,
+            _mint: offering?.account?.mint ? offering?.account?.mint : null,
+            mint: offering?.account?.mint
+              ? offering?.account?.mint?.toBase58()
+              : null,
+            name: offering?.account?.mint
+              ? "NFT - " + offering?.account?.mint?.toBase58()
+              : offering?.account?.amount?.toNumber() / LAMPORTS_PER_SOL +
+                " SOL",
+          });
+        })
+      );
 
       setOfferings(offerings);
     } catch (e) {
@@ -183,7 +198,7 @@ export const NFTJoin: FC<{
     if (!sendTransaction) return;
     const res = await sendTransaction(tx);
     if (res.toString().includes("Error")) return;
-    toast.success("Offering added!");
+    toast.success("Offering is being added!");
     setMint("");
     setOpen(false);
     console.info("sig: ", res);
@@ -204,7 +219,7 @@ export const NFTJoin: FC<{
     if (!sendTransaction) return;
     const res = await sendTransaction(tx);
     if (res.toString().includes("Error")) return;
-    toast.success("Offering removing!");
+    toast.success("Offering is being removed!");
     setOpenOffering(false);
     console.info("sig: ", res);
   };
@@ -226,17 +241,7 @@ export const NFTJoin: FC<{
     console.info("sig: ", res);
   };
 
-  const onClickOffering = async (offering: any) => {
-    if (offering._mint) {
-      const mx = Metaplex.make(connection).use(guestIdentity());
-      const nft = await mx.nfts().findByMint({ mintAddress: offering._mint });
-      const response = await fetch(nft?.uri);
-      const metadata = await response.json();
-      offering.metadata = metadata;
-    }
-    setSelectedOffering(offering);
-    setOpenOffering(true);
-  };
+  console.log("offerings", offerings);
 
   return (
     <>
@@ -327,59 +332,121 @@ export const NFTJoin: FC<{
 
       {viewOfferings && (
         <>
-          <FormControl fullWidth sx={{ mb: 1, mt: 2.5 }}>
-            <InputLabel>Offerings</InputLabel>
-            <Select
-              multiple
-              native
-              label="Native"
-              disabled={isLoading || challengeAddress.length !== 44}
-              value={[selectedOffering]}
-              sx={{
-                borderBottomRightRadius: 0,
-                borderBottomLeftRadius: 0,
-                overflow: "auto",
-              }}
-            >
-              {offerings.length > 0 ? (
-                offerings.map((offering: any, i: number) => {
-                  return (
-                    <option
-                      key={i}
-                      value={offering.name}
-                      onClick={() => onClickOffering(offering)}
-                      style={{
-                        padding: 5,
-                        borderBottom: "1px solid #646567",
+          <Typography variant="subtitle1" sx={{ mt: 2 }}>
+            Offerings
+          </Typography>
+          <Box
+            sx={{
+              width: "100%",
+              minHeight: "100px",
+              borderRadius: "10px",
+              borderBottomLeftRadius: "0px",
+              borderBottomRightRadius: "0px",
+              border: "1px solid #6b727e",
+              display: "flex",
+              alignItems: "center",
+
+              overflow: "auto",
+              padding: "5px",
+            }}
+          >
+            {offerings.length > 0 ? (
+              offerings.map((offering: any, i: number) => {
+                return (
+                  <Button
+                    key={i}
+                    variant="outlined"
+                    onClick={() => {
+                      setSelectedOffering(offering);
+                      setOpenOffering(true);
+                    }}
+                    style={{
+                      margin: "5px 5px",
+                      borderBottom: "1px solid #646567",
+                      height: "90px",
+                      width: "50px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-start",
+                      alignContent: "flex-start",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 0.5,
                         overflow: "hidden",
-                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
                       }}
                     >
-                      {offering.name}
-                    </option>
-                  );
-                })
-              ) : (
-                <option>No offerings yet.</option>
-              )}
-            </Select>
+                      {!offering?.mint ? offering.amount?.toString() : "NFT"}
+                    </Typography>
 
-            <IconButton
-              onClick={() => {
-                toast.success("Refreshing offerings...");
-                getOfferings();
-              }}
-              sx={{
-                position: "absolute",
-                right: 0,
-                marginRight: "5px",
-                marginTop: "2px",
-                minWidth: "5px",
-              }}
-            >
-              <RefreshIcon />
-            </IconButton>
-          </FormControl>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "50px",
+                      }}
+                    >
+                      {!offering?.mint ? (
+                        <img
+                          src={"./assets/solana.svg"}
+                          alt="Solana"
+                          style={{ height: "25px", width: "auto" }}
+                        ></img>
+                      ) : offering?.metadata?.image ? (
+                        <img
+                          src={offering?.metadata?.image}
+                          alt={offering?.metadata?.name}
+                          style={{ height: "50px", width: "auto" }}
+                        ></img>
+                      ) : null}
+                    </Box>
+                  </Button>
+                );
+              })
+            ) : (
+              <Typography>No offerings yet.</Typography>
+            )}
+          </Box>
+
+          <Button
+            className="join-button"
+            onClick={() => {
+              toast.success("Refreshing offerings...");
+              getOfferings();
+            }}
+            fullWidth
+            variant="contained"
+            size="large"
+            disabled={
+              isLoading ||
+              accepted ||
+              challengeAddress.length !== 44 ||
+              playerStatus !== "JOINED"
+            }
+            sx={{
+              backgroundColor: "#349bc6",
+              borderRadius: "10px",
+              borderTopLeftRadius: "0px",
+              borderTopRightRadius: "0px",
+              fontFamily: "Rubik",
+              textTransform: "none",
+              boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
+              "&:hover": {
+                boxShadow: "none !important",
+                backgroundColor: "#ff714f14",
+              },
+            }}
+          >
+            <RefreshIcon sx={{ mr: 1 }} />
+            Refresh Offerings
+          </Button>
+
           <Button
             className="join-button"
             onClick={() => setOpen(!open)}
@@ -394,7 +461,7 @@ export const NFTJoin: FC<{
             }
             sx={{
               backgroundColor: "#349bc6",
-              mt: 1,
+              mt: 2,
               fontFamily: "Rubik",
               textTransform: "none",
               boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
@@ -552,7 +619,7 @@ export const NFTJoin: FC<{
       >
         <Box
           sx={{
-            width: "350px",
+            width: "300px",
           }}
         >
           <DialogTitle
@@ -573,7 +640,6 @@ export const NFTJoin: FC<{
               justifyContent: "center",
               alignItems: "center",
               flexDirection: "column",
-              padding: "0 20px",
             }}
           >
             {selectedOffering?.metadata?.image ? (
@@ -645,10 +711,18 @@ export const NFTJoin: FC<{
               />
             </FormControl>
 
+            <FormGroup>
+              <FormControlLabel
+                label="Is Escrowed"
+                control={<Checkbox checked={selectedOffering?.isEscrowed} />}
+                sx={{ mb: 2 }}
+              />
+            </FormGroup>
+
             <Button
               fullWidth
               variant="contained"
-              sx={{ mb: 2, borderTopRightRadius: 0, borderTopLeftRadius: 0 }}
+              sx={{ mb: 2 }}
               onClick={() => removeOffering()}
               disabled={
                 isLoading ||
