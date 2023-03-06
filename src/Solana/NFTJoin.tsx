@@ -86,7 +86,7 @@ export const NFTJoin: FC<{
   const [openOffering, setOpenOffering] = useState<boolean>(false);
   const [accepted, setAccepted] = useState<boolean>(false);
   const [playerStatus, setPlayerStatus] = useState<string>("");
-  const [escrowless, setEscrowless] = useState<boolean>(false);
+  const [escrowed, setEscrowed] = useState<boolean>(false);
   const [tokenAmount, setTokenAmount] = useState<number>(1);
 
   useEffect(() => {
@@ -185,11 +185,11 @@ export const NFTJoin: FC<{
     var tx: Transaction | undefined;
     if (type === "SOL") {
       tx = await ludexTx.addSolOffering(publicKey, amount).getTx();
-    } else if (type === "NFT" && !escrowless) {
+    } else if (type === "NFT" && escrowed) {
       tx = await ludexTx
         .addEscrowedOffering(publicKey, mint, tokenAmount)
         .getTx();
-    } else if (type === "NFT" && escrowless) {
+    } else if (type === "NFT" && !escrowed) {
       tx = await ludexTx.addEscrowlessOffering(publicKey, mint).getTx();
     } else throw new Error("Invalid offering type");
     const result = await connection.getLatestBlockhash();
@@ -519,7 +519,7 @@ export const NFTJoin: FC<{
       >
         <Box
           sx={{
-            width: "350px",
+            width: "300px",
           }}
         >
           <DialogTitle
@@ -571,11 +571,11 @@ export const NFTJoin: FC<{
               label="Mint Address"
               value={mint}
               onChange={(e) => setMint(e.currentTarget.value)}
-              sx={{ mb: 2 }}
             />
 
-            {!escrowless && (
+            {!escrowed && (
               <TextField
+                sx={{ mt: 2 }}
                 size="small"
                 fullWidth
                 label="Token Amount"
@@ -589,11 +589,11 @@ export const NFTJoin: FC<{
 
             <FormGroup>
               <FormControlLabel
-                label="Escrowless (Metaplex NFTs only)"
+                label="Escrowed"
                 control={
                   <Checkbox
-                    checked={escrowless}
-                    onClick={() => setEscrowless(!escrowless)}
+                    checked={escrowed}
+                    onClick={() => setEscrowed(!escrowed)}
                   />
                 }
               />
@@ -684,7 +684,7 @@ export const NFTJoin: FC<{
               />
             </FormControl>
 
-            <FormControl size="small" fullWidth sx={{ width: "100%", mb: 2 }}>
+            <FormControl size="small" fullWidth sx={{ width: "100%", mb: 1 }}>
               <InputLabel>Offering</InputLabel>
               <OutlinedInput
                 value={selectedOffering?.publicKey}
@@ -715,7 +715,7 @@ export const NFTJoin: FC<{
               <FormControlLabel
                 label="Is Escrowed"
                 control={<Checkbox checked={selectedOffering?.isEscrowed} />}
-                sx={{ mb: 2 }}
+                sx={{ mb: 1 }}
               />
             </FormGroup>
 
