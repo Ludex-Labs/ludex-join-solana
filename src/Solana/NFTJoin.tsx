@@ -513,13 +513,14 @@ export const NFTJoin: FC<{
       )}
 
       <Dialog
-        className="dark-dialog-slim"
+        className="dark-dialog"
         onClose={() => setOpen(false)}
         open={open}
       >
         <Box
           sx={{
-            width: "300px",
+            width: "100%",
+            maxWidth: "300px",
           }}
         >
           <DialogTitle
@@ -533,8 +534,7 @@ export const NFTJoin: FC<{
               justifyContent: "center",
               alignItems: "center",
               flexDirection: "column",
-              padding: "0 24px",
-              paddingBottom: "16px",
+              minWidth: "250px",
             }}
           >
             <TextField
@@ -554,7 +554,18 @@ export const NFTJoin: FC<{
               fullWidth
               size="small"
               variant="contained"
-              sx={{ mb: 2 }}
+              sx={{
+                mb: 2,
+                backgroundColor: "#349bc6",
+                fontFamily: "Rubik",
+                textTransform: "none",
+                boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
+                borderRadius: "10px !important",
+                "&:hover": {
+                  boxShadow: "none !important",
+                  backgroundColor: "#ff714f14",
+                },
+              }}
               onClick={() => addOffering("SOL")}
               disabled={isLoading || amount === 0}
             >
@@ -604,7 +615,18 @@ export const NFTJoin: FC<{
               variant="contained"
               onClick={() => addOffering("NFT")}
               disabled={isLoading || mint?.length !== 44}
-              sx={{ mb: 2 }}
+              sx={{
+                mb: 2,
+                backgroundColor: "#349bc6",
+                fontFamily: "Rubik",
+                textTransform: "none",
+                boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
+                borderRadius: "10px !important",
+                "&:hover": {
+                  boxShadow: "none !important",
+                  backgroundColor: "#ff714f14",
+                },
+              }}
             >
               Add Token Offering
             </Button>
@@ -619,7 +641,8 @@ export const NFTJoin: FC<{
       >
         <Box
           sx={{
-            width: "300px",
+            width: "100%",
+            maxWidth: "300px",
           }}
         >
           <DialogTitle
@@ -722,7 +745,18 @@ export const NFTJoin: FC<{
             <Button
               fullWidth
               variant="contained"
-              sx={{ mb: 2 }}
+              sx={{
+                mb: 2,
+                backgroundColor: "#349bc6",
+                fontFamily: "Rubik",
+                textTransform: "none",
+                boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
+                borderRadius: "10px !important",
+                "&:hover": {
+                  boxShadow: "none !important",
+                  backgroundColor: "#ff714f14",
+                },
+              }}
               onClick={() => removeOffering()}
               disabled={
                 isLoading ||
