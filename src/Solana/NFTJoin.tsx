@@ -134,7 +134,7 @@ export const NFTJoin: FC<{
       const offerings: DeserialziedOffering[] = [];
 
       await Promise.all(
-        _offerings.map(async (offering: Offering) => {
+        _offerings.map(async (offering: any) => {
           let metadata: any = null;
           if (offering?.account?.mint) {
             const mx = await Metaplex.make(connection).use(guestIdentity());

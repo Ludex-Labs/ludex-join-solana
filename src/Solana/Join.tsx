@@ -133,14 +133,14 @@ export const Join: FC<{
       tx.recentBlockhash = (await result).blockhash;
       const res = await sendTransaction(tx);
       if (!res.toString().includes("Error")) {
-        setJoined(true);
-        toast.success("Challenge joined!");
+        setJoined(false);
+        toast.success("Challenge left!");
         console.info("sig: ", res);
       }
     } catch (error) {
       console.error(error);
       if (error?.toString().includes("Error")) {
-        toast.error("Join challenge failed");
+        toast.error("Leave challenge failed");
       }
     }
   };

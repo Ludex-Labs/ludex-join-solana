@@ -5,7 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@ludex-labs/ludex-sdk-js": "^1.8.16",
+    "@ludex-labs/ludex-sdk-js": "^1.8.18",
     "@metaplex-foundation/js": "^0.18.3",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.1",
