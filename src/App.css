@@ -65,8 +65,8 @@ a {
 }
 
 .chain-container-1 {
-  height: 80%;
-  width: 80%;
+  height: auto;
+  width: 175px;
 }
 
 @keyframes float {
@@ -102,7 +102,7 @@ a {
 
 .dark-dialog-slim .MuiPaper-root {
   background: #374151;
-  border-radius: 32px;
+  border-radius: 15px;
 }
 
 .MuiNativeSelect-select {

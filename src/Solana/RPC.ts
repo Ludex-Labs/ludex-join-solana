@@ -1,12 +1,7 @@
-import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
+import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
 import { SafeEventEmitterProvider } from "@web3auth/base";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { toast } from "react-hot-toast";
-import {
-  createAssociatedTokenAccountInstruction,
-  getAssociatedTokenAddress,
-  TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
 import {
   Connection,
   LAMPORTS_PER_SOL,
@@ -131,14 +126,14 @@ export const viewTokenAccounts = async (
   try {
     if (provider === null) return;
     const _publicKey = new PublicKey(publicKey);
+    const splToken = await import("@solana/spl-token");
     let tokenAccounts = await connection.getParsedTokenAccountsByOwner(
       _publicKey,
       {
-        programId: TOKEN_PROGRAM_ID,
+        programId: splToken.TOKEN_PROGRAM_ID,
       }
     );
-    toast.success("Token Accounts logged in console!");
-    console.log("tokenAccounts", tokenAccounts);
+    return tokenAccounts;
   } catch (error) {
     console.error(error);
   }
@@ -155,11 +150,16 @@ export const importToken = async (
     const solanaWallet = new SolanaWallet(provider);
     const mintPubkey = new PublicKey(tokenToImport);
     const _publicKey = new PublicKey(publicKey);
-    let ata = await getAssociatedTokenAddress(mintPubkey, _publicKey);
+    const splToken = await import("@solana/spl-token");
+    let ata = await splToken.getAssociatedTokenAddress(
+      mintPubkey,
+      _publicKey,
+      true
+    );
     // eslint-disable-next-line prefer-destructuring
     const blockhash = (await connection.getLatestBlockhash()).blockhash;
     const tx = new Transaction().add(
-      createAssociatedTokenAccountInstruction(
+      splToken.createAssociatedTokenAccountInstruction(
         _publicKey,
         ata,
         _publicKey,
@@ -170,7 +170,10 @@ export const importToken = async (
     tx.recentBlockhash = blockhash;
     const signed_tx = await solanaWallet.signTransaction(tx);
     const signature = await connection.sendRawTransaction(
-      signed_tx.serialize()
+      signed_tx.serialize(),
+      {
+        skipPreflight: true,
+      }
     );
     console.log("signature", signature);
     toast.success("Import token success!");

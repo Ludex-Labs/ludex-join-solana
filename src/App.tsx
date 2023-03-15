@@ -6,7 +6,7 @@ import { Join } from "./Solana/Join";
 import { RPC } from "./Solana/RPC";
 import { WalletSolana } from "./Solana/WalletSolana";
 import { Connection } from "@solana/web3.js";
-import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
+import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
 
 // @ts-ignore
 import StarfieldAnimation from "react-starfield-animation";
@@ -133,25 +133,19 @@ function App() {
       <Box className="container-page">
         <span className="join-container">
           {!connection && (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <Box sx={{ mb: 4, width: "80%", height: "80%" }}>
+            <>
+              <Box sx={{ mb: 2, width: "80%" }}>
                 <img
                   src="../assets/ludex-logo.svg"
                   alt="Ludex"
                   className="logo"
                 />
               </Box>
-              <Box sx={{ fontSize: "20px", mb: 5 }}>
-                Please click on the button
+              <Box sx={{ fontSize: "20px", mb: 3 }}>
+                Click the button
                 <br /> below to sign in
               </Box>
-            </Box>
+            </>
           )}
           {provider && viewWallet && connection ? (
             <WalletSolana
@@ -177,6 +171,7 @@ function App() {
               className="btn-login"
               variant={"contained"}
               size="large"
+              sx={{ width: "100%" }}
               onClick={() => login()}
             >
               Sign In
@@ -219,7 +214,7 @@ function App() {
                       sx={{
                         fontFamily: "Rubik",
                         ml: viewWallet ? 0 : "5px",
-                        fontSize: "1rem",
+                        fontSize: "15px",
                         fontWeight: 500,
                         textTransform: "none",
                       }}
@@ -227,30 +222,6 @@ function App() {
                       {viewWallet ? "Back" : "Wallet"}
                     </Box>
                   </>
-                </Button>
-                <Button
-                  sx={{
-                    backgroundColor: "#e34d5a",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "10px",
-                    borderRadius: "10px",
-                    marginTop: "1rem",
-                    maxWidth: "290px",
-                    height: "42.25px",
-                    boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
-                    textTransform: "none",
-                    fontWeight: "bold",
-                    "&:hover": {
-                      boxShadow: "none !important",
-                    },
-                  }}
-                  onClick={() => {
-                    logout();
-                    window.location.reload();
-                  }}
-                >
-                  Logout
                 </Button>
               </Box>
 
@@ -267,18 +238,13 @@ function App() {
                     mb: 1,
                   }}
                 >
-                  POWERED WITH
+                  POWERED BY
                 </Box>
                 <img
                   alt="solana"
                   src="./assets/solana-title.svg"
                   className="chain-container-1"
                 />
-                {/* <img
-              alt="solana"
-              src="./assets/solana.svg"
-              className="chain-container"
-            /> */}
               </Box>
             </>
           )}

@@ -1,6 +1,6 @@
 import { FC, useState } from "react";
 import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js";
-import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
+import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
 import { clusterApiUrl, Connection, PublicKey } from "@solana/web3.js";
 import { Box, Button, Dialog, DialogTitle, TextField } from "@mui/material";
 import { toast } from "react-hot-toast";

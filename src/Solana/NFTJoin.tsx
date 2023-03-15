@@ -3,7 +3,8 @@ import { FC, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 import { NFTChallenge } from "@ludex-labs/ludex-sdk-js";
-import { Wallet } from "@ludex-labs/ludex-sdk-js/lib/web3/utils";
+import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
+import { Offering } from "@ludex-labs/ludex-sdk-js/web3/solana/nft-challenge/client";
 import { guestIdentity, Metaplex } from "@metaplex-foundation/js";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -22,7 +23,6 @@ import {
   InputAdornment,
   InputLabel,
   OutlinedInput,
-  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -32,18 +32,6 @@ import {
   PublicKey,
   Transaction,
 } from "@solana/web3.js";
-
-interface Offering {
-  account: {
-    player: PublicKey;
-    tokenAccount: PublicKey | null;
-    mint: PublicKey | null;
-    isEscrowed: boolean;
-    amount: any;
-  };
-  authority: PublicKey | undefined;
-  publicKey: PublicKey;
-}
 
 interface DeserialziedOffering {
   name: string;
@@ -63,8 +51,9 @@ export const NFTJoin: FC<{
   challengeAddress: string;
   connection: Connection;
   isLoading: boolean;
-  setIsLoading: (isLoading: boolean) => void;
   sendTransaction?: (tx: Transaction) => Promise<string>;
+  viewOfferings?: boolean;
+  setViewOfferings?: (view: boolean) => void;
 }> = (props) => {
   const {
     publicKey,
@@ -73,11 +62,12 @@ export const NFTJoin: FC<{
     challengeAddress,
     connection,
     isLoading,
-    setIsLoading,
     sendTransaction,
+    viewOfferings,
+    setViewOfferings,
   } = props;
   const [open, setOpen] = useState<boolean>(false);
-  const [NFTmint, setNFTmint] = useState<string>("");
+  const [mint, setMint] = useState<string>("");
   const [amount, setAmount] = useState<number>(0.001);
   const [selectedOffering, setSelectedOffering] =
     useState<DeserialziedOffering | null>(null);
@@ -85,7 +75,8 @@ export const NFTJoin: FC<{
   const [openOffering, setOpenOffering] = useState<boolean>(false);
   const [accepted, setAccepted] = useState<boolean>(false);
   const [playerStatus, setPlayerStatus] = useState<string>("");
-  const [escrowless, setEscrowless] = useState<boolean>(false);
+  const [escrowed, setEscrowed] = useState<boolean>(false);
+  const [tokenAmount, setTokenAmount] = useState<number>(1);
 
   useEffect(() => {
     if (challengeAddress.length !== 44) return;
@@ -129,22 +120,38 @@ export const NFTJoin: FC<{
         challengeAddress
       );
 
-      const offerings = _offerings.map((offering: Offering) => {
-        return {
-          amount: offering?.account?.amount?.toNumber() / LAMPORTS_PER_SOL,
-          isEscrowed: offering?.account.isEscrowed,
-          publicKey: offering?.publicKey?.toBase58(),
-          authority: offering?.authority ? offering?.authority?.toBase58() : "",
-          metadata: null,
-          _mint: offering?.account?.mint ? offering?.account?.mint : null,
-          mint: offering?.account?.mint
-            ? offering?.account?.mint?.toBase58()
-            : null,
-          name: offering?.account?.mint
-            ? "NFT - " + offering?.account?.mint?.toBase58()
-            : offering?.account?.amount?.toNumber() / LAMPORTS_PER_SOL + " SOL",
-        };
-      });
+      console.log(_offerings);
+
+      const offerings: DeserialziedOffering[] = [];
+
+      await Promise.all(
+        _offerings.map(async (offering: Offering) => {
+          let metadata: any = null;
+
+          if (offering?.mint) {
+            const mx = await Metaplex.make(connection).use(guestIdentity());
+            const nft = await mx
+              .nfts()
+              .findByMint({ mintAddress: offering?.mint });
+            const response = await fetch(nft?.uri);
+            metadata = await response.json();
+          }
+          offerings.push({
+            amount: offering?.amount?.toNumber() / LAMPORTS_PER_SOL,
+            isEscrowed: offering.isEscrowed,
+            publicKey: offering?.publicKey?.toBase58(),
+            authority: offering?.authority
+              ? offering?.authority?.toBase58()
+              : "",
+            metadata: metadata,
+            _mint: offering?.mint ? offering?.mint : null,
+            mint: offering?.mint ? offering?.mint?.toBase58() : null,
+            name: offering?.mint
+              ? "NFT - " + offering?.mint?.toBase58()
+              : offering?.amount?.toNumber() / LAMPORTS_PER_SOL + " SOL",
+          });
+        })
+      );
 
       setOfferings(offerings);
     } catch (e) {
@@ -167,8 +174,12 @@ export const NFTJoin: FC<{
     var tx: Transaction | undefined;
     if (type === "SOL") {
       tx = await ludexTx.addSolOffering(publicKey, amount).getTx();
-    } else if (type === "NFT") {
-      tx = await ludexTx.addNftOffering(publicKey, NFTmint, 1).getTx();
+    } else if (type === "NFT" && escrowed) {
+      tx = await ludexTx
+        .addEscrowedOffering(publicKey, mint, tokenAmount)
+        .getTx();
+    } else if (type === "NFT" && !escrowed) {
+      tx = await ludexTx.addEscrowlessOffering(publicKey, mint).getTx();
     } else throw new Error("Invalid offering type");
     const result = await connection.getLatestBlockhash();
     tx.recentBlockhash = result.blockhash;
@@ -176,8 +187,8 @@ export const NFTJoin: FC<{
     if (!sendTransaction) return;
     const res = await sendTransaction(tx);
     if (res.toString().includes("Error")) return;
-    toast.success("Offering added!");
-    setNFTmint("");
+    toast.success("Offering is being added!");
+    setMint("");
     setOpen(false);
     console.info("sig: ", res);
   };
@@ -187,6 +198,7 @@ export const NFTJoin: FC<{
       connection,
       challengeAddress
     );
+
     if (!selectedOffering?.publicKey) return;
     var tx = await ludexTx
       .removeOffering(publicKey, selectedOffering?.publicKey)
@@ -197,7 +209,7 @@ export const NFTJoin: FC<{
     if (!sendTransaction) return;
     const res = await sendTransaction(tx);
     if (res.toString().includes("Error")) return;
-    toast.success("Offering removing!");
+    toast.success("Offering is being removed!");
     setOpenOffering(false);
     console.info("sig: ", res);
   };
@@ -219,111 +231,212 @@ export const NFTJoin: FC<{
     console.info("sig: ", res);
   };
 
-  const onClickOffering = async (offering: any) => {
-    if (offering._mint) {
-      const mx = Metaplex.make(connection).use(guestIdentity());
-      const nft = await mx.nfts().findByMint({ mintAddress: offering._mint });
-      const response = await fetch(nft?.uri);
-      const metadata = await response.json();
-      offering.metadata = metadata;
-    }
-    setSelectedOffering(offering);
-    setOpenOffering(true);
-  };
-
-  console.log(playerStatus);
+  console.log("offerings", offerings);
 
   return (
     <>
-      <Button
-        className="join-button"
-        fullWidth
-        size="large"
-        variant="contained"
-        onClick={() => joinNFTChallenge()}
-        disabled={
-          isLoading ||
-          challengeAddress.length !== 44 ||
-          playerStatus === "JOINED" ||
-          playerStatus === "ACCEPTED"
-        }
-        sx={{
-          backgroundColor: "#3eb718",
-          mt: 1,
-          fontFamily: "Rubik",
-          textTransform: "none",
-          boxShadow: "#3eb71870 0px 8px 16px 0px!important",
-          borderRadius: "10px !important",
-          "&:hover": {
-            boxShadow: "none !important",
-            backgroundColor: "#ff714f14",
-          },
-        }}
-      >
-        {playerStatus === "JOINED" || playerStatus === "ACCEPTED" ? (
-          <>
-            <CheckCircleOutlineIcon sx={{ mr: 1 }} />
-            Joined
-          </>
-        ) : (
-          "Join"
-        )}
-      </Button>
-      {(playerStatus === "JOINED" || playerStatus === "ACCEPTED") && (
+      {viewOfferings ? (
+        <Button
+          fullWidth
+          size="large"
+          variant="contained"
+          onClick={() => setViewOfferings && setViewOfferings(false)}
+          sx={{
+            backgroundColor: "#ff714f",
+            display: "flex",
+            alignItems: "center",
+            padding: "10px",
+            borderRadius: "10px",
+            maxWidth: "290px",
+            height: "42.25px",
+            boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+            "&:hover": {
+              boxShadow: "none !important",
+            },
+            fontFamily: "Rubik",
+            fontSize: "1rem",
+            fontWeight: 500,
+            textTransform: "none",
+          }}
+        >
+          Back
+        </Button>
+      ) : (
         <>
-          <FormControl fullWidth sx={{ mb: 1, mt: 4 }}>
-            <InputLabel>Offerings</InputLabel>
-            <Select
-              multiple
-              native
-              label="Native"
-              disabled={isLoading || challengeAddress.length !== 44}
-              value={[selectedOffering]}
-              sx={{
-                borderBottomRightRadius: 0,
-                borderBottomLeftRadius: 0,
-                overflow: "auto",
-              }}
-            >
-              {offerings.length > 0 ? (
-                offerings.map((offering: any, i: number) => {
-                  return (
-                    <option
-                      key={i}
-                      value={offering.name}
-                      onClick={() => onClickOffering(offering)}
-                      style={{
-                        padding: 5,
-                        borderBottom: "1px solid #646567",
+          <Button
+            className="join-button"
+            fullWidth
+            size="large"
+            variant="contained"
+            onClick={() => joinNFTChallenge()}
+            disabled={
+              isLoading ||
+              challengeAddress.length !== 44 ||
+              playerStatus === "JOINED" ||
+              playerStatus === "ACCEPTED"
+            }
+            sx={{
+              backgroundColor: "#3eb718",
+              fontFamily: "Rubik",
+              textTransform: "none",
+              boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+              borderRadius: "10px !important",
+              "&:hover": {
+                boxShadow: "none !important",
+                backgroundColor: "#ff714f14",
+              },
+            }}
+          >
+            {playerStatus === "JOINED" || playerStatus === "ACCEPTED" ? (
+              <>
+                <CheckCircleOutlineIcon sx={{ mr: 1 }} />
+                Joined
+              </>
+            ) : (
+              "Join"
+            )}
+          </Button>
+          <Button
+            className="join-button"
+            onClick={() => setViewOfferings && setViewOfferings(true)}
+            fullWidth
+            variant="contained"
+            size="large"
+            sx={{
+              backgroundColor: "#349bc6",
+              mt: 2,
+              fontFamily: "Rubik",
+              textTransform: "none",
+              boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
+              borderRadius: "10px !important",
+              "&:hover": {
+                boxShadow: "none !important",
+                backgroundColor: "#ff714f14",
+              },
+            }}
+          >
+            Offerings
+          </Button>
+        </>
+      )}
+
+      {viewOfferings && (
+        <>
+          <Typography variant="subtitle1" sx={{ mt: 2 }}>
+            Offerings
+          </Typography>
+          <Box
+            sx={{
+              width: "100%",
+              minHeight: "100px",
+              borderRadius: "10px",
+              borderBottomLeftRadius: "0px",
+              borderBottomRightRadius: "0px",
+              border: "1px solid #6b727e",
+              display: "flex",
+              alignItems: "center",
+
+              overflow: "auto",
+              padding: "5px",
+            }}
+          >
+            {offerings.length > 0 ? (
+              offerings.map((offering: any, i: number) => {
+                return (
+                  <Button
+                    key={i}
+                    variant="outlined"
+                    onClick={() => {
+                      setSelectedOffering(offering);
+                      setOpenOffering(true);
+                    }}
+                    style={{
+                      margin: "5px 5px",
+                      borderBottom: "1px solid #646567",
+                      height: "90px",
+                      width: "50px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-start",
+                      alignContent: "flex-start",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        mb: 0.5,
                         overflow: "hidden",
-                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
                       }}
                     >
-                      {offering.name}
-                    </option>
-                  );
-                })
-              ) : (
-                <option>No offerings yet.</option>
-              )}
-            </Select>
+                      {!offering?.mint ? offering.amount?.toString() : "NFT"}
+                    </Typography>
 
-            <IconButton
-              onClick={() => {
-                toast.success("Refreshing offerings...");
-                getOfferings();
-              }}
-              sx={{
-                position: "absolute",
-                right: 0,
-                marginRight: "5px",
-                marginTop: "2px",
-                minWidth: "5px",
-              }}
-            >
-              <RefreshIcon />
-            </IconButton>
-          </FormControl>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "50px",
+                      }}
+                    >
+                      {!offering?.mint ? (
+                        <img
+                          src={"./assets/solana.svg"}
+                          alt="Solana"
+                          style={{ height: "25px", width: "auto" }}
+                        ></img>
+                      ) : offering?.metadata?.image ? (
+                        <img
+                          src={offering?.metadata?.image}
+                          alt={offering?.metadata?.name}
+                          style={{ height: "50px", width: "auto" }}
+                        ></img>
+                      ) : null}
+                    </Box>
+                  </Button>
+                );
+              })
+            ) : (
+              <Typography sx={{ width: "100%" }}>No offerings yet.</Typography>
+            )}
+          </Box>
+
+          <Button
+            className="join-button"
+            onClick={() => {
+              toast.success("Refreshing offerings...");
+              getOfferings();
+            }}
+            fullWidth
+            variant="contained"
+            size="large"
+            disabled={
+              isLoading ||
+              accepted ||
+              challengeAddress.length !== 44 ||
+              playerStatus !== "JOINED"
+            }
+            sx={{
+              backgroundColor: "#349bc6",
+              borderRadius: "10px",
+              borderTopLeftRadius: "0px",
+              borderTopRightRadius: "0px",
+              fontFamily: "Rubik",
+              textTransform: "none",
+              boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
+              "&:hover": {
+                boxShadow: "none !important",
+                backgroundColor: "#ff714f14",
+              },
+            }}
+          >
+            <RefreshIcon sx={{ mr: 1 }} />
+            Refresh Offerings
+          </Button>
+
           <Button
             className="join-button"
             onClick={() => setOpen(!open)}
@@ -334,11 +447,11 @@ export const NFTJoin: FC<{
               isLoading ||
               accepted ||
               challengeAddress.length !== 44 ||
-              playerStatus === "ACCEPTED"
+              playerStatus !== "JOINED"
             }
             sx={{
               backgroundColor: "#349bc6",
-              mt: 1,
+              mt: 2,
               fontFamily: "Rubik",
               textTransform: "none",
               boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
@@ -362,7 +475,7 @@ export const NFTJoin: FC<{
               isLoading ||
               accepted ||
               challengeAddress.length !== 44 ||
-              playerStatus === "ACCEPTED"
+              playerStatus !== "ACCEPTED"
             }
             sx={{
               backgroundColor: "#3eb718",
@@ -390,13 +503,14 @@ export const NFTJoin: FC<{
       )}
 
       <Dialog
-        className="dark-dialog-slim"
+        className="dark-dialog"
         onClose={() => setOpen(false)}
         open={open}
       >
         <Box
           sx={{
-            width: "350px",
+            width: "100%",
+            maxWidth: "300px",
           }}
         >
           <DialogTitle
@@ -410,8 +524,7 @@ export const NFTJoin: FC<{
               justifyContent: "center",
               alignItems: "center",
               flexDirection: "column",
-              padding: "0 24px",
-              paddingBottom: "16px",
+              minWidth: "250px",
             }}
           >
             <TextField
@@ -431,7 +544,18 @@ export const NFTJoin: FC<{
               fullWidth
               size="small"
               variant="contained"
-              sx={{ mb: 2 }}
+              sx={{
+                mb: 2,
+                backgroundColor: "#349bc6",
+                fontFamily: "Rubik",
+                textTransform: "none",
+                boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
+                borderRadius: "10px !important",
+                "&:hover": {
+                  boxShadow: "none !important",
+                  backgroundColor: "#ff714f14",
+                },
+              }}
               onClick={() => addOffering("SOL")}
               disabled={isLoading || amount === 0}
             >
@@ -445,18 +569,32 @@ export const NFTJoin: FC<{
             <TextField
               size="small"
               fullWidth
-              label="NFT Mint Address"
-              value={NFTmint}
-              onChange={(e) => setNFTmint(e.currentTarget.value)}
+              label="Mint Address"
+              value={mint}
+              onChange={(e) => setMint(e.currentTarget.value)}
             />
+
+            {!escrowed && (
+              <TextField
+                sx={{ mt: 2 }}
+                size="small"
+                fullWidth
+                label="Token Amount"
+                type="number"
+                value={tokenAmount}
+                onChange={(e) =>
+                  setTokenAmount(parseInt(e.currentTarget.value))
+                }
+              />
+            )}
 
             <FormGroup>
               <FormControlLabel
-                label="Escrowless"
+                label="Escrowed"
                 control={
                   <Checkbox
-                    checked={escrowless}
-                    onClick={() => setEscrowless(!escrowless)}
+                    checked={escrowed}
+                    onClick={() => setEscrowed(!escrowed)}
                   />
                 }
               />
@@ -466,10 +604,21 @@ export const NFTJoin: FC<{
               fullWidth
               variant="contained"
               onClick={() => addOffering("NFT")}
-              disabled={isLoading || NFTmint?.length !== 44}
-              sx={{ mb: 2 }}
+              disabled={isLoading || mint?.length !== 44}
+              sx={{
+                mb: 2,
+                backgroundColor: "#349bc6",
+                fontFamily: "Rubik",
+                textTransform: "none",
+                boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
+                borderRadius: "10px !important",
+                "&:hover": {
+                  boxShadow: "none !important",
+                  backgroundColor: "#ff714f14",
+                },
+              }}
             >
-              Add NFT Offering
+              Add Token Offering
             </Button>
           </Box>
         </Box>
@@ -482,7 +631,8 @@ export const NFTJoin: FC<{
       >
         <Box
           sx={{
-            width: "350px",
+            width: "100%",
+            maxWidth: "300px",
           }}
         >
           <DialogTitle
@@ -503,7 +653,6 @@ export const NFTJoin: FC<{
               justifyContent: "center",
               alignItems: "center",
               flexDirection: "column",
-              padding: "0 20px",
             }}
           >
             {selectedOffering?.metadata?.image ? (
@@ -548,7 +697,7 @@ export const NFTJoin: FC<{
               />
             </FormControl>
 
-            <FormControl size="small" fullWidth sx={{ width: "100%", mb: 2 }}>
+            <FormControl size="small" fullWidth sx={{ width: "100%", mb: 1 }}>
               <InputLabel>Offering</InputLabel>
               <OutlinedInput
                 value={selectedOffering?.publicKey}
@@ -575,10 +724,29 @@ export const NFTJoin: FC<{
               />
             </FormControl>
 
+            <FormGroup>
+              <FormControlLabel
+                label="Is Escrowed"
+                control={<Checkbox checked={selectedOffering?.isEscrowed} />}
+                sx={{ mb: 1 }}
+              />
+            </FormGroup>
+
             <Button
               fullWidth
               variant="contained"
-              sx={{ mb: 2, borderTopRightRadius: 0, borderTopLeftRadius: 0 }}
+              sx={{
+                mb: 2,
+                backgroundColor: "#349bc6",
+                fontFamily: "Rubik",
+                textTransform: "none",
+                boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
+                borderRadius: "10px !important",
+                "&:hover": {
+                  boxShadow: "none !important",
+                  backgroundColor: "#ff714f14",
+                },
+              }}
               onClick={() => removeOffering()}
               disabled={
                 isLoading ||
