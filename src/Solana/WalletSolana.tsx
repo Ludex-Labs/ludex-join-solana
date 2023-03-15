@@ -22,7 +22,6 @@ import {
   Select,
   Typography,
 } from "@mui/material";
-import NotesIcon from "@mui/icons-material/Notes";
 import SettingsIcon from "@mui/icons-material/Settings";
 import UploadIcon from "@mui/icons-material/Upload";
 
