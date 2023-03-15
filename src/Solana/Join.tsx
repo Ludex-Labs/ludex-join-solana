@@ -3,6 +3,10 @@ import { FC, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Challenge } from "@ludex-labs/ludex-sdk-js";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
+import {
+  getChallengeInfo,
+  Challenge as _Challenge,
+} from "@ludex-labs/ludex-sdk-js/web3/solana/challenge/client";
 import { Connection, Transaction } from "@solana/web3.js";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { SafeEventEmitterProvider } from "@web3auth/base";
@@ -10,6 +14,7 @@ import { NFTJoin } from "./NFTJoin";
 
 // MUI
 import {
+  Box,
   Button,
   Typography,
   FormControl,
@@ -36,6 +41,7 @@ export const Join: FC<{
   const [challengeAddress, setChallengeAddress] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [viewOfferings, setViewOfferings] = useState<boolean>(false);
+  const [challenge, setChallenge] = useState<_Challenge | undefined>(undefined);
 
   useEffect(() => {
     (async () => {
@@ -142,6 +148,19 @@ export const Join: FC<{
     }
   };
 
+  const fetchChallengeDetails = async () => {
+    const challengeDetails = await getChallengeInfo(
+      connection,
+      challengeAddress,
+      {
+        wallet: wallet,
+        cluster: isMainnet ? "MAINNET" : "DEVNET",
+      }
+    );
+    toast.success("Fetching challenge details...");
+    setChallenge(challengeDetails);
+  };
+
   return (
     <>
       {!viewOfferings && (
@@ -197,6 +216,123 @@ export const Join: FC<{
             </Select>
           </FormControl>
         </>
+      )}
+
+      {challenge && (
+        <>
+          <Box
+            sx={{
+              pb: 1,
+              border: "1px solid rgb(107, 114, 126)",
+              borderRadius: "6px 6px 0px 0px",
+              padding: 1.5,
+              fontSize: "14px",
+              overflow: "auto",
+              width: "100%",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <span>Mint</span>
+              <a
+                href={`https://solscan.io/account/${challenge?.mint}`}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  maxWidth: "100px",
+                  opacity: "0.7",
+                  textDecoration: "underline",
+                }}
+              >
+                {challenge?.mint?.substring(0, 10)}...
+              </a>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <span>Entry Fee</span>
+              <span>{challenge?.entryFee?.toString()}</span>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <span>Provider Rake</span>
+              <span>{challenge?.providerRake?.toString()}</span>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <span>Mediator Rake</span>
+              <span>{challenge?.mediatorRake?.toString()}</span>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <span>Players Joined</span>
+              <span>
+                {challenge?.currentPlayerCount +
+                  " / " +
+                  challenge?.maxPlayerCount}
+              </span>
+            </Box>
+          </Box>
+        </>
+      )}
+
+      {type === "FT" && (
+        <Button
+          className="join-button"
+          fullWidth
+          variant="contained"
+          size="large"
+          disabled={isLoading || challengeAddress.length < 35 || joined}
+          sx={
+            challenge
+              ? {
+                  borderRadius: "8px !important",
+                  borderTopRightRadius: "0px !important",
+                  borderTopLeftRadius: "0px !important",
+                  backgroundColor: "#3eb718",
+                  fontFamily: "Rubik",
+                  textTransform: "none",
+                  boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+                  "&:hover": {
+                    boxShadow: "none !important",
+                    backgroundColor: "#ff714f14",
+                  },
+                }
+              : {
+                  backgroundColor: "#3eb718",
+                  fontFamily: "Rubik",
+                  textTransform: "none",
+                  boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+                  borderRadius: "8px !important",
+                  "&:hover": {
+                    boxShadow: "none !important",
+                    backgroundColor: "#ff714f14",
+                  },
+                }
+          }
+          onClick={() => fetchChallengeDetails()}
+        >
+          {isLoading ? <CircularProgress size={24} /> : "View Challenge"}
+        </Button>
       )}
 
       {type === "FT" ? (
