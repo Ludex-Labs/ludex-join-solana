@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 
 import { NFTChallenge } from "@ludex-labs/ludex-sdk-js";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
+import { Offering } from "@ludex-labs/ludex-sdk-js/web3/solana/nft-challenge/client";
 import { guestIdentity, Metaplex } from "@metaplex-foundation/js";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -31,15 +32,6 @@ import {
   PublicKey,
   Transaction,
 } from "@solana/web3.js";
-
-interface Offering {
-  publicKey?: any;
-  amount: any;
-  mint?: any;
-  authority: PublicKey | undefined;
-  isEscrowed: boolean;
-  player: PublicKey | undefined;
-}
 
 interface DeserialziedOffering {
   name: string;
@@ -128,11 +120,12 @@ export const NFTJoin: FC<{
         challengeAddress
       );
 
+      console.log(_offerings);
+
       const offerings: DeserialziedOffering[] = [];
 
       await Promise.all(
         _offerings.map(async (offering: Offering) => {
-          console.log(offering);
           let metadata: any = null;
 
           if (offering?.mint) {
@@ -205,6 +198,7 @@ export const NFTJoin: FC<{
       connection,
       challengeAddress
     );
+
     if (!selectedOffering?.publicKey) return;
     var tx = await ludexTx
       .removeOffering(publicKey, selectedOffering?.publicKey)
