@@ -133,14 +133,8 @@ function App() {
       <Box className="container-page">
         <span className="join-container">
           {!connection && (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <Box sx={{ mb: 3, width: "80%", height: "80%" }}>
+            <>
+              <Box sx={{ mb: 2, width: "80%" }}>
                 <img
                   src="../assets/ludex-logo.svg"
                   alt="Ludex"
@@ -148,10 +142,10 @@ function App() {
                 />
               </Box>
               <Box sx={{ fontSize: "20px", mb: 3 }}>
-                Please click on the button
+                Click the button
                 <br /> below to sign in
               </Box>
-            </Box>
+            </>
           )}
           {provider && viewWallet && connection ? (
             <WalletSolana
@@ -161,6 +155,7 @@ function App() {
               isMainnet={isMainnet}
               connection={connection}
               changeNetwork={changeNetwork}
+              logout={logout}
             />
           ) : provider && connection != null ? (
             <Join
@@ -176,6 +171,7 @@ function App() {
               className="btn-login"
               variant={"contained"}
               size="large"
+              sx={{ width: "100%" }}
               onClick={() => login()}
             >
               Sign In
@@ -227,34 +223,11 @@ function App() {
                     </Box>
                   </>
                 </Button>
-                <Button
-                  sx={{
-                    backgroundColor: "#e34d5a",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "10px",
-                    borderRadius: "10px",
-                    marginTop: "1rem",
-                    maxWidth: "290px",
-                    height: "42.25px",
-                    boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
-                    textTransform: "none",
-                    fontWeight: "bold",
-                    "&:hover": {
-                      boxShadow: "none !important",
-                    },
-                  }}
-                  onClick={() => {
-                    logout();
-                  }}
-                >
-                  Logout
-                </Button>
               </Box>
 
               <Box
                 sx={{
-                  mt: 3,
+                  mt: 2,
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
@@ -265,7 +238,7 @@ function App() {
                     mb: 1,
                   }}
                 >
-                  POWERED WITH
+                  POWERED BY
                 </Box>
                 <img
                   alt="solana"

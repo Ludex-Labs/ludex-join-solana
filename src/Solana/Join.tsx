@@ -11,17 +11,14 @@ import { NFTJoin } from "./NFTJoin";
 // MUI
 import {
   Button,
-  IconButton,
   Typography,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   OutlinedInput,
-  InputAdornment,
   CircularProgress,
 } from "@mui/material";
-import DescriptionIcon from "@mui/icons-material/Description";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 export const Join: FC<{
@@ -153,6 +150,7 @@ export const Join: FC<{
             Join Challenge
           </Typography>
           <FormControl
+            size="small"
             disabled={isLoading}
             fullWidth
             sx={{ width: "100%", mb: 2 }}
@@ -164,23 +162,6 @@ export const Join: FC<{
               label="Challenge Address"
               disabled={joined}
               fullWidth
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    disabled={challengeAddress === ""}
-                    onClick={() =>
-                      window.open(
-                        "https://solscan.io/account/" +
-                          challengeAddress +
-                          `?cluster=${isMainnet ? "mainnet" : "devnet"}`,
-                        "_blank"
-                      )
-                    }
-                  >
-                    <DescriptionIcon />
-                  </IconButton>
-                </InputAdornment>
-              }
             />
           </FormControl>
 

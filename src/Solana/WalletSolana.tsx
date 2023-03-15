@@ -27,17 +27,16 @@ import UploadIcon from "@mui/icons-material/Upload";
 
 // Button Style
 const buttonStyles = {
+  height: "42px",
   textTransform: "none",
   fontFamily: "Rubik",
   boxShadow: "#9945ff2e 0px 8px 16px 0px !important",
   borderRadius: "8px !important",
   minWidth: "100% !important",
   background: "linear-gradient(90deg, #9945FF 0%, #14F195 100%) !important",
-  border: "1.5px solid rgba(255, 255, 255, 0.8)",
   transition: "all 0.3s ease 0s",
   "&:hover": {
-    boxShadow: "none !important",
-    background: "#374151 !important",
+    opacity: "0.5",
   },
 };
 
@@ -48,9 +47,17 @@ export const WalletSolana: FC<{
   connection: Connection;
   wallet: Wallet | undefined;
   changeNetwork: (network: string) => void;
+  logout: () => void;
 }> = (props) => {
-  const { provider, publicKey, isMainnet, connection, wallet, changeNetwork } =
-    props;
+  const {
+    provider,
+    publicKey,
+    isMainnet,
+    connection,
+    wallet,
+    changeNetwork,
+    logout,
+  } = props;
   const [balance, setBalance] = useState<number | undefined>(undefined);
   const [openMint, setOpenMint] = useState(false);
   const [openImportToken, setOpenImportToken] = useState(false);
@@ -80,7 +87,7 @@ export const WalletSolana: FC<{
       <Typography variant={"h5"} sx={{ mb: 3.5 }}>
         Your Wallet
       </Typography>
-      <FormControl fullWidth sx={{ width: "100%", mb: 2 }}>
+      <FormControl size="small" fullWidth sx={{ width: "100%", mb: 2 }}>
         <InputLabel>Public Key</InputLabel>
         <OutlinedInput
           value={publicKey}
@@ -106,7 +113,7 @@ export const WalletSolana: FC<{
         />
       </FormControl>
 
-      <FormControl fullWidth sx={{ width: "100%", mb: 2 }}>
+      <FormControl size="small" fullWidth sx={{ width: "100%", mb: 2 }}>
         <InputLabel>Balance</InputLabel>
         <OutlinedInput
           value={balance?.toString() + " SOL"}
@@ -116,7 +123,7 @@ export const WalletSolana: FC<{
         />
       </FormControl>
 
-      <FormControl fullWidth sx={{ mb: 2 }}>
+      <FormControl size="small" fullWidth sx={{ mb: 2 }}>
         <InputLabel>Network</InputLabel>
         <Select
           value={isMainnet ? "mainnet" : "devnet"}
@@ -132,7 +139,7 @@ export const WalletSolana: FC<{
         </Select>
       </FormControl>
 
-      <Box style={{ flexWrap: "wrap", margin: 5 }}>
+      <Box style={{ flexWrap: "wrap" }}>
         {isMainnet ? (
           <Button
             variant="contained"
@@ -203,6 +210,31 @@ export const WalletSolana: FC<{
           }
         >
           SPL Tokens
+        </Button>
+
+        <Button
+          sx={{
+            width: "100%",
+            backgroundColor: "#e34d5a",
+            display: "flex",
+            alignItems: "center",
+            padding: "10px",
+            borderRadius: "10px",
+            marginTop: "1rem",
+            maxWidth: "290px",
+            height: "42.25px",
+            boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
+            textTransform: "none",
+            fontWeight: "bold",
+            "&:hover": {
+              boxShadow: "none !important",
+            },
+          }}
+          onClick={() => {
+            logout();
+          }}
+        >
+          Logout
         </Button>
       </Box>
 

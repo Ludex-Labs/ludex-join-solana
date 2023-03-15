@@ -33,15 +33,12 @@ import {
 } from "@solana/web3.js";
 
 interface Offering {
-  account: {
-    player: PublicKey;
-    tokenAccount: PublicKey | null;
-    mint: PublicKey | null;
-    isEscrowed: boolean;
-    amount: any;
-  };
+  publicKey?: any;
+  amount: any;
+  mint?: any;
   authority: PublicKey | undefined;
-  publicKey: PublicKey;
+  isEscrowed: boolean;
+  player: PublicKey | undefined;
 }
 
 interface DeserialziedOffering {
@@ -134,32 +131,31 @@ export const NFTJoin: FC<{
       const offerings: DeserialziedOffering[] = [];
 
       await Promise.all(
-        _offerings.map(async (offering: any) => {
+        _offerings.map(async (offering: Offering) => {
+          console.log(offering);
           let metadata: any = null;
-          if (offering?.account?.mint) {
+
+          if (offering?.mint) {
             const mx = await Metaplex.make(connection).use(guestIdentity());
             const nft = await mx
               .nfts()
-              .findByMint({ mintAddress: offering?.account?.mint });
+              .findByMint({ mintAddress: offering?.mint });
             const response = await fetch(nft?.uri);
             metadata = await response.json();
           }
           offerings.push({
-            amount: offering?.account?.amount?.toNumber() / LAMPORTS_PER_SOL,
-            isEscrowed: offering?.account.isEscrowed,
+            amount: offering?.amount?.toNumber() / LAMPORTS_PER_SOL,
+            isEscrowed: offering.isEscrowed,
             publicKey: offering?.publicKey?.toBase58(),
             authority: offering?.authority
               ? offering?.authority?.toBase58()
               : "",
             metadata: metadata,
-            _mint: offering?.account?.mint ? offering?.account?.mint : null,
-            mint: offering?.account?.mint
-              ? offering?.account?.mint?.toBase58()
-              : null,
-            name: offering?.account?.mint
-              ? "NFT - " + offering?.account?.mint?.toBase58()
-              : offering?.account?.amount?.toNumber() / LAMPORTS_PER_SOL +
-                " SOL",
+            _mint: offering?.mint ? offering?.mint : null,
+            mint: offering?.mint ? offering?.mint?.toBase58() : null,
+            name: offering?.mint
+              ? "NFT - " + offering?.mint?.toBase58()
+              : offering?.amount?.toNumber() / LAMPORTS_PER_SOL + " SOL",
           });
         })
       );
@@ -410,7 +406,7 @@ export const NFTJoin: FC<{
                 );
               })
             ) : (
-              <Typography>No offerings yet.</Typography>
+              <Typography sx={{ width: "100%" }}>No offerings yet.</Typography>
             )}
           </Box>
 
