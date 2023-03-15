@@ -11,6 +11,7 @@ import {
   Box,
   Button,
   Dialog,
+  DialogContent,
   DialogTitle,
   FormControl,
   IconButton,
@@ -60,8 +61,9 @@ export const WalletSolana: FC<{
   } = props;
   const [balance, setBalance] = useState<number | undefined>(undefined);
   const [openMint, setOpenMint] = useState(false);
-  const [openImportToken, setOpenImportToken] = useState(false);
+  const [openSPLToken, setOpenSPLToken] = useState(false);
   const [tokenToImport, setTokenToImport] = useState("");
+  const [tokenAccounts, setTokenAcccount] = useState<any>();
 
   const getBalance = async () => {
     if (!provider) {
@@ -81,6 +83,20 @@ export const WalletSolana: FC<{
     getBalance();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isMainnet]);
+
+  const fetchTokenAccounts = async () => {
+    if (provider === null) return;
+    toast.success("SPL Tokens logged to console!");
+    const tokenAccounts = await viewTokenAccounts(
+      provider,
+      publicKey,
+      connection
+    );
+    console.info("tokenAccounts", tokenAccounts);
+    setTokenAcccount(tokenAccounts);
+  };
+
+  console.log("tokenAccounts", tokenAccounts);
 
   return (
     <>
@@ -198,9 +214,12 @@ export const WalletSolana: FC<{
         <Button
           variant="contained"
           size="small"
-          onClick={() => setOpenImportToken(!openImportToken)}
+          onClick={() => {
+            fetchTokenAccounts();
+            setOpenSPLToken(!openSPLToken);
+          }}
           sx={
-            openImportToken
+            openSPLToken
               ? {
                   ...buttonStyles,
                 }
@@ -240,21 +259,22 @@ export const WalletSolana: FC<{
 
       <Dialog
         className="dark-dialog"
-        onClose={() => setOpenImportToken(false)}
-        open={openImportToken}
+        onClose={() => setOpenSPLToken(false)}
+        open={openSPLToken}
       >
         <DialogTitle
           sx={{ textAlign: "center", fontFamily: "Rubik", fontWeight: 400 }}
         >
           SPL Tokens
         </DialogTitle>
-        <Box>
+        <DialogContent>
           <FormControl fullWidth>
             <InputLabel>Import Token</InputLabel>
             <OutlinedInput
               value={tokenToImport}
               label="Import Token"
               onChange={(e) => setTokenToImport(e.target.value)}
+              fullWidth
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
@@ -272,22 +292,66 @@ export const WalletSolana: FC<{
                   >
                     <UploadIcon />
                   </IconButton>
-                  <IconButton
-                    onClick={() => {
-                      if (provider !== null) {
-                        toast.success("SPL Tokens logged to console!");
-                        viewTokenAccounts(provider, publicKey, connection);
-                      }
-                    }}
-                  >
-                    <NotesIcon />
-                  </IconButton>
                 </InputAdornment>
               }
-              fullWidth
             />
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                mt: 2,
+                border: "1px solid #666d79",
+                borderRadius: "5px",
+                padding: "5px",
+                overflow: "auto",
+              }}
+            >
+              {tokenAccounts?.value &&
+                tokenAccounts?.value?.length > 0 &&
+                tokenAccounts?.value.map((token, index) => {
+                  const amount =
+                    token?.account?.data?.parsed?.info?.tokenAmount?.uiAmount;
+                  const mint = token?.account?.data?.parsed?.info?.mint;
+
+                  return (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontFamily: "Rubik",
+                          fontWeight: 400,
+                          color: "#fff",
+                          fontSize: "12px",
+                          minWidth: "50px",
+                          background: "#464f5d",
+                          textAlign: "center",
+                          marginRight: "5px",
+                        }}
+                      >
+                        {amount}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontFamily: "Rubik",
+                          fontWeight: 400,
+                          color: "#fff",
+                          fontSize: "12px",
+                          textAlign: "left",
+                        }}
+                      >
+                        {mint}
+                      </Typography>
+                    </Box>
+                  );
+                })}
+            </Box>
           </FormControl>
-        </Box>
+        </DialogContent>
       </Dialog>
 
       {connection !== null && (

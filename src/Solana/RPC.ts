@@ -133,8 +133,7 @@ export const viewTokenAccounts = async (
         programId: splToken.TOKEN_PROGRAM_ID,
       }
     );
-    toast.success("Token Accounts logged in console!");
-    console.log("tokenAccounts", tokenAccounts);
+    return tokenAccounts;
   } catch (error) {
     console.error(error);
   }
