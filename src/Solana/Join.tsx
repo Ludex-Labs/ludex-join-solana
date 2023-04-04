@@ -43,7 +43,7 @@ export const Join: FC<{
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [viewOfferings, setViewOfferings] = useState<boolean>(false);
   const [challenge, setChallenge] = useState<_Challenge | undefined>(undefined);
-  const [isExchange, setIsExchange] = useState<boolean>(false);
+  const [isTrade, setIsTrade] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
@@ -51,11 +51,11 @@ export const Join: FC<{
       const challengeType = params.get("type")?.toUpperCase();
       const isMainnetParam = params.get("isMainnet");
       const challengeAddress = params.get("c");
-      const exchangeParam = params.get("isExchange");
+      const isTradeParam = params.get("isTrade");
       if (challengeType !== undefined) setType(challengeType);
       if (isMainnetParam === "true") changeNetwork("mainnet");
       if (challengeAddress !== null) setChallengeAddress(challengeAddress);
-      if (exchangeParam === "true") setIsExchange(true);
+      if (isTradeParam === "true") setIsTrade(true);
     })();
   }, [publicKey]);
 
@@ -168,7 +168,7 @@ export const Join: FC<{
   return (
     <Box
       sx={
-        isExchange
+        isTrade
           ? {}
           : {
               width: "300px",
@@ -179,7 +179,7 @@ export const Join: FC<{
       {!viewOfferings && (
         <>
           <Typography variant={"h5"} sx={{ mb: 3.5 }}>
-            Join {isExchange ? "Exchange" : "Challenge"}
+            Join {isTrade ? "Exchange" : "Challenge"}
           </Typography>
           <FormControl
             size="small"
@@ -214,7 +214,7 @@ export const Join: FC<{
             </Select>
           </FormControl>
 
-          {!isExchange && (
+          {!isTrade && (
             <FormControl size="small" fullWidth sx={{ mb: 2 }}>
               <InputLabel>Type</InputLabel>
               <Select
@@ -408,7 +408,7 @@ export const Join: FC<{
             </Button>
           )}
         </>
-      ) : isExchange ? (
+      ) : isTrade ? (
         <Exchange
           publicKey={publicKey}
           wallet={wallet}
