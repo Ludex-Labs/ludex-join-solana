@@ -11,6 +11,7 @@ import { Connection, Transaction } from "@solana/web3.js";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { SafeEventEmitterProvider } from "@web3auth/base";
 import { NFTJoin } from "./NFTJoin";
+import { Exchange } from "./Exchange";
 
 // MUI
 import {
@@ -42,6 +43,7 @@ export const Join: FC<{
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [viewOfferings, setViewOfferings] = useState<boolean>(false);
   const [challenge, setChallenge] = useState<_Challenge | undefined>(undefined);
+  const [isExchange, setIsExchange] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
@@ -49,9 +51,11 @@ export const Join: FC<{
       const challengeType = params.get("type")?.toUpperCase();
       const isMainnetParam = params.get("isMainnet");
       const challengeAddress = params.get("c");
+      const exchangeParam = params.get("isExchange");
       if (challengeType !== undefined) setType(challengeType);
       if (isMainnetParam === "true") changeNetwork("mainnet");
       if (challengeAddress !== null) setChallengeAddress(challengeAddress);
+      if (exchangeParam === "true") setIsExchange(true);
     })();
   }, [publicKey]);
 
@@ -162,11 +166,15 @@ export const Join: FC<{
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        minWidth: "350px",
+      }}
+    >
       {!viewOfferings && (
         <>
           <Typography variant={"h5"} sx={{ mb: 3.5 }}>
-            Join Challenge
+            Join {isExchange ? "Exchange" : "Challenge"}
           </Typography>
           <FormControl
             size="small"
@@ -201,20 +209,22 @@ export const Join: FC<{
             </Select>
           </FormControl>
 
-          <FormControl size="small" fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Type</InputLabel>
-            <Select
-              value={type === "FT" ? "FT" : "NFT"}
-              disabled={joined || isLoading}
-              label="Type"
-              onChange={(e) =>
-                e.target.value === "FT" ? setType("FT") : setType("NFT")
-              }
-            >
-              <MenuItem value={"FT"}>Fungible Token</MenuItem>
-              <MenuItem value={"NFT"}>Non-Fungible Token</MenuItem>
-            </Select>
-          </FormControl>
+          {!isExchange && (
+            <FormControl size="small" fullWidth sx={{ mb: 2 }}>
+              <InputLabel>Type</InputLabel>
+              <Select
+                value={type === "FT" ? "FT" : "NFT"}
+                disabled={joined || isLoading}
+                label="Type"
+                onChange={(e) =>
+                  e.target.value === "FT" ? setType("FT") : setType("NFT")
+                }
+              >
+                <MenuItem value={"FT"}>Fungible Token</MenuItem>
+                <MenuItem value={"NFT"}>Non-Fungible Token</MenuItem>
+              </Select>
+            </FormControl>
+          )}
         </>
       )}
 
@@ -393,6 +403,18 @@ export const Join: FC<{
             </Button>
           )}
         </>
+      ) : isExchange ? (
+        <Exchange
+          publicKey={publicKey}
+          wallet={wallet}
+          sendTransaction={sendTransaction}
+          isMainnet={isMainnet}
+          challengeAddress={challengeAddress}
+          connection={connection}
+          isLoading={isLoading}
+          viewOfferings={viewOfferings}
+          setViewOfferings={setViewOfferings}
+        />
       ) : (
         <NFTJoin
           publicKey={publicKey}
@@ -406,6 +428,6 @@ export const Join: FC<{
           setViewOfferings={setViewOfferings}
         />
       )}
-    </>
+    </Box>
   );
 };

@@ -184,6 +184,7 @@ function App() {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
+                  alignItems: "center",
                   width: "100%",
                 }}
               >
@@ -191,6 +192,7 @@ function App() {
 
                 <Button
                   sx={{
+                    minWidth: "250px",
                     backgroundColor: "#ff714f",
                     display: "flex",
                     alignItems: "center",

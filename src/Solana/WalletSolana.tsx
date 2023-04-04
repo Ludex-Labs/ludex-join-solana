@@ -232,6 +232,7 @@ export const WalletSolana: FC<{
 
         <Button
           sx={{
+            minWidth: "100% !important",
             width: "100%",
             backgroundColor: "#e34d5a",
             display: "flex",

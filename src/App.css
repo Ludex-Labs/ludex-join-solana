@@ -46,7 +46,7 @@ a {
   background: #374151;
   border-radius: 15px;
   padding: 30px;
-  width: 317px;
+  min-width: 317px;
   /* max-width: 350px; */
   min-height: 300px;
   display: flex;

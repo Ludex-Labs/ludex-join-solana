@@ -9,6 +9,7 @@ import { guestIdentity, Metaplex } from "@metaplex-foundation/js";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import DescriptionIcon from "@mui/icons-material/Description";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 // MUI
 import {
   Box,
@@ -44,7 +45,7 @@ interface DeserialziedOffering {
   metadata: any;
 }
 
-export const NFTJoin: FC<{
+export const Exchange: FC<{
   publicKey: string;
   wallet?: Wallet;
   isMainnet: boolean;
@@ -119,8 +120,6 @@ export const NFTJoin: FC<{
         connection,
         challengeAddress
       );
-
-      console.log(_offerings);
 
       const offerings: DeserialziedOffering[] = [];
 
@@ -231,36 +230,48 @@ export const NFTJoin: FC<{
     console.info("sig: ", res);
   };
 
-  console.log("offerings", offerings);
+  const myOfferings = offerings.filter(
+    (offering) => offering?.authority === wallet?.publicKey?.toBase58()
+  );
+  const opponentsOfferings = offerings.filter(
+    (offering) => offering?.authority !== wallet?.publicKey?.toBase58()
+  );
 
   return (
-    <>
+    <Box
+      sx={{
+        width: "500px",
+      }}
+    >
       {viewOfferings ? (
-        <Button
-          fullWidth
-          size="large"
-          variant="contained"
-          onClick={() => setViewOfferings && setViewOfferings(false)}
+        <Box
           sx={{
-            backgroundColor: "#ff714f",
+            width: "100%",
             display: "flex",
-            alignItems: "center",
-            padding: "10px",
-            borderRadius: "10px",
-            maxWidth: "290px",
-            height: "42.25px",
-            boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
-            "&:hover": {
-              boxShadow: "none !important",
-            },
-            fontFamily: "Rubik",
-            fontSize: "1rem",
-            fontWeight: 500,
-            textTransform: "none",
+            justifyContent: "space-between",
           }}
         >
-          Back
-        </Button>
+          <IconButton
+            onClick={() => setViewOfferings && setViewOfferings(false)}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+
+          <IconButton
+            disabled={
+              isLoading ||
+              accepted ||
+              challengeAddress.length < 40 ||
+              playerStatus !== "JOINED"
+            }
+            onClick={() => {
+              toast.success("Refreshing offerings...");
+              getOfferings();
+            }}
+          >
+            <RefreshIcon />
+          </IconButton>
+        </Box>
       ) : (
         <>
           <Button
@@ -315,190 +326,291 @@ export const NFTJoin: FC<{
               },
             }}
           >
-            Offerings
+            Exchange
           </Button>
         </>
       )}
 
       {viewOfferings && (
         <>
-          <Typography variant="subtitle1" sx={{ mt: 2 }}>
-            Offerings
-          </Typography>
-          <Box
-            sx={{
-              width: "100%",
-              minHeight: "100px",
-              borderRadius: "10px",
-              borderBottomLeftRadius: "0px",
-              borderBottomRightRadius: "0px",
-              border: "1px solid #6b727e",
-              display: "flex",
-              alignItems: "center",
+          <Box sx={{ display: "flex", gap: "10px" }}>
+            <Box
+              sx={{
+                flex: 1,
+                width: "100%",
+                minHeight: "250px",
+                borderRadius: "10px",
+                border: "1px solid #6b727e",
+                display: "flex",
+                alignItems: "center",
+                overflow: "auto",
+                padding: "5px",
+                flexDirection: "column",
+              }}
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "30px",
+                  borderBottom: "1px solid #646567",
+                }}
+              >
+                <Typography sx={{ width: "100%" }}>Your Offerings</Typography>
+              </Box>
+              <Box
+                sx={{
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  overflow: "auto",
+                  padding: "5px",
+                }}
+              >
+                {myOfferings.length > 0 ? (
+                  myOfferings.map((offering: any, i: number) => {
+                    return (
+                      <Button
+                        key={i}
+                        variant="outlined"
+                        onClick={() => {
+                          setSelectedOffering(offering);
+                          setOpenOffering(true);
+                        }}
+                        style={{
+                          margin: "5px 5px",
+                          borderBottom: "1px solid #646567",
+                          height: "90px",
+                          width: "50px",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "flex-start",
+                          alignContent: "flex-start",
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            mb: 0.5,
+                            overflow: "hidden",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {!offering?.mint
+                            ? offering.amount?.toString()
+                            : "NFT"}
+                        </Typography>
 
-              overflow: "auto",
-              padding: "5px",
-            }}
-          >
-            {offerings.length > 0 ? (
-              offerings.map((offering: any, i: number) => {
-                return (
-                  <Button
-                    key={i}
-                    variant="outlined"
-                    onClick={() => {
-                      setSelectedOffering(offering);
-                      setOpenOffering(true);
-                    }}
-                    style={{
-                      margin: "5px 5px",
-                      borderBottom: "1px solid #646567",
-                      height: "90px",
-                      width: "50px",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "flex-start",
-                      alignContent: "flex-start",
-                      overflow: "hidden",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        mb: 0.5,
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {!offering?.mint ? offering.amount?.toString() : "NFT"}
-                    </Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            height: "50px",
+                          }}
+                        >
+                          {!offering?.mint ? (
+                            <img
+                              src={"./assets/solana.svg"}
+                              alt="Solana"
+                              style={{ height: "25px", width: "auto" }}
+                            ></img>
+                          ) : offering?.metadata?.image ? (
+                            <img
+                              src={offering?.metadata?.image}
+                              alt={offering?.metadata?.name}
+                              style={{ height: "50px", width: "auto" }}
+                            ></img>
+                          ) : null}
+                        </Box>
+                      </Button>
+                    );
+                  })
+                ) : (
+                  <Typography sx={{ width: "100%" }}>
+                    No offerings yet.
+                  </Typography>
+                )}
+              </Box>
+            </Box>
 
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "50px",
-                      }}
-                    >
-                      {!offering?.mint ? (
-                        <img
-                          src={"./assets/solana.svg"}
-                          alt="Solana"
-                          style={{ height: "25px", width: "auto" }}
-                        ></img>
-                      ) : offering?.metadata?.image ? (
-                        <img
-                          src={offering?.metadata?.image}
-                          alt={offering?.metadata?.name}
-                          style={{ height: "50px", width: "auto" }}
-                        ></img>
-                      ) : null}
-                    </Box>
-                  </Button>
-                );
-              })
-            ) : (
-              <Typography sx={{ width: "100%" }}>No offerings yet.</Typography>
-            )}
+            <Box
+              sx={{
+                flex: 1,
+                width: "100%",
+                minHeight: "100px",
+                borderRadius: "10px",
+                border: "1px solid #6b727e",
+                display: "flex",
+                alignItems: "center",
+                overflow: "auto",
+                padding: "5px",
+                flexDirection: "column",
+              }}
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "30px",
+                  borderBottom: "1px solid #646567",
+                }}
+              >
+                <Typography sx={{ width: "100%" }}>
+                  Opponents Offerings
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  overflow: "auto",
+                  padding: "5px",
+                }}
+              >
+                {opponentsOfferings.length > 0 ? (
+                  opponentsOfferings.map((offering: any, i: number) => {
+                    return (
+                      <Button
+                        key={i}
+                        variant="outlined"
+                        onClick={() => {
+                          setSelectedOffering(offering);
+                          setOpenOffering(true);
+                        }}
+                        style={{
+                          margin: "5px 5px",
+                          borderBottom: "1px solid #646567",
+                          height: "90px",
+                          width: "50px",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "flex-start",
+                          alignContent: "flex-start",
+                          overflow: "hidden",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            mb: 0.5,
+                            overflow: "hidden",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {!offering?.mint
+                            ? offering.amount?.toString()
+                            : "NFT"}
+                        </Typography>
+
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            height: "50px",
+                          }}
+                        >
+                          {!offering?.mint ? (
+                            <img
+                              src={"./assets/solana.svg"}
+                              alt="Solana"
+                              style={{ height: "25px", width: "auto" }}
+                            ></img>
+                          ) : offering?.metadata?.image ? (
+                            <img
+                              src={offering?.metadata?.image}
+                              alt={offering?.metadata?.name}
+                              style={{ height: "50px", width: "auto" }}
+                            ></img>
+                          ) : null}
+                        </Box>
+                      </Button>
+                    );
+                  })
+                ) : (
+                  <Typography sx={{ width: "100%" }}>
+                    No offerings yet.
+                  </Typography>
+                )}
+              </Box>
+            </Box>
           </Box>
 
-          <Button
-            className="join-button"
-            onClick={() => {
-              toast.success("Refreshing offerings...");
-              getOfferings();
-            }}
-            fullWidth
-            variant="contained"
-            size="large"
-            disabled={
-              isLoading ||
-              accepted ||
-              challengeAddress.length < 40 ||
-              playerStatus !== "JOINED"
-            }
+          <Box
             sx={{
-              backgroundColor: "#349bc6",
-              borderRadius: "10px",
-              borderTopLeftRadius: "0px",
-              borderTopRightRadius: "0px",
-              fontFamily: "Rubik",
-              textTransform: "none",
-              boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
-              "&:hover": {
-                boxShadow: "none !important",
-                backgroundColor: "#ff714f14",
-              },
-            }}
-          >
-            <RefreshIcon sx={{ mr: 1 }} />
-            Refresh Offerings
-          </Button>
-
-          <Button
-            className="join-button"
-            onClick={() => setOpen(!open)}
-            fullWidth
-            variant="contained"
-            size="large"
-            disabled={
-              isLoading ||
-              accepted ||
-              challengeAddress.length < 40 ||
-              playerStatus !== "JOINED"
-            }
-            sx={{
-              backgroundColor: "#349bc6",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
               mt: 2,
-              fontFamily: "Rubik",
-              textTransform: "none",
-              boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
-              borderRadius: "10px !important",
-              "&:hover": {
-                boxShadow: "none !important",
-                backgroundColor: "#ff714f14",
-              },
+              mb: 2,
             }}
           >
-            Add Offering
-          </Button>
+            <Button
+              className="join-button"
+              onClick={() => setOpen(!open)}
+              variant="contained"
+              size="large"
+              disabled={
+                isLoading ||
+                accepted ||
+                challengeAddress.length < 40 ||
+                playerStatus !== "JOINED"
+              }
+              sx={{
+                minWidth: "150px",
+                backgroundColor: "#349bc6",
+                mr: 1,
+                borderRadius: "10px",
+                fontFamily: "Rubik",
+                textTransform: "none",
+                boxShadow: "#397f9d7a 0px 8px 16px 0px!important",
+                "&:hover": {
+                  boxShadow: "none !important",
+                  backgroundColor: "#ff714f14",
+                },
+              }}
+            >
+              Add Offering
+            </Button>
 
-          <Button
-            className="join-button"
-            fullWidth
-            variant="contained"
-            onClick={() => acceptOffering()}
-            size="large"
-            disabled={
-              isLoading ||
-              accepted ||
-              challengeAddress.length < 40 ||
-              playerStatus !== "ACCEPTED"
-            }
-            sx={{
-              backgroundColor: "#3eb718",
-              mt: 2,
-              fontFamily: "Rubik",
-              textTransform: "none",
-              boxShadow: "#3eb71870 0px 8px 16px 0px!important",
-              borderRadius: "10px !important",
-              "&:hover": {
-                boxShadow: "none !important",
-                backgroundColor: "#ff714f14",
-              },
-            }}
-          >
-            {playerStatus !== "ACCEPTED" ? (
-              "Accept"
-            ) : (
-              <>
-                <CheckCircleOutlineIcon sx={{ mr: 1 }} />
-                Accepted
-              </>
-            )}
-          </Button>
+            <Button
+              className="join-button"
+              variant="contained"
+              onClick={() => acceptOffering()}
+              size="large"
+              disabled={
+                isLoading ||
+                accepted ||
+                challengeAddress.length < 40 ||
+                playerStatus === "ACCEPTED"
+              }
+              sx={{
+                minWidth: "150px",
+                backgroundColor: "#3eb718",
+                ml: 1,
+                fontFamily: "Rubik",
+                textTransform: "none",
+                boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+                borderRadius: "10px !important",
+                "&:hover": {
+                  boxShadow: "none !important",
+                  backgroundColor: "#ff714f14",
+                },
+              }}
+            >
+              {playerStatus !== "ACCEPTED" ? (
+                "Accept"
+              ) : (
+                <>
+                  <CheckCircleOutlineIcon sx={{ mr: 1 }} />
+                  Accepted
+                </>
+              )}
+            </Button>
+          </Box>
         </>
       )}
 
@@ -758,6 +870,6 @@ export const NFTJoin: FC<{
           </Box>
         </Box>
       </Dialog>
-    </>
+    </Box>
   );
 };
