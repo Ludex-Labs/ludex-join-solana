@@ -167,9 +167,14 @@ export const Join: FC<{
 
   return (
     <Box
-      sx={{
-        minWidth: "350px",
-      }}
+      sx={
+        isExchange
+          ? {}
+          : {
+              width: "300px",
+              minWidth: "300px",
+            }
+      }
     >
       {!viewOfferings && (
         <>

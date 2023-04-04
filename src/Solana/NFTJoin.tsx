@@ -120,8 +120,6 @@ export const NFTJoin: FC<{
         challengeAddress
       );
 
-      console.log(_offerings);
-
       const offerings: DeserialziedOffering[] = [];
 
       await Promise.all(
@@ -230,8 +228,6 @@ export const NFTJoin: FC<{
     setAccepted(true);
     console.info("sig: ", res);
   };
-
-  console.log("offerings", offerings);
 
   return (
     <>
@@ -475,7 +471,7 @@ export const NFTJoin: FC<{
               isLoading ||
               accepted ||
               challengeAddress.length < 40 ||
-              playerStatus !== "ACCEPTED"
+              playerStatus === "ACCEPTED"
             }
             sx={{
               backgroundColor: "#3eb718",
