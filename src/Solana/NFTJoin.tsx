@@ -2,13 +2,20 @@
 import { FC, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
-import { NFTChallenge } from "@ludex-labs/ludex-sdk-js";
+import { NftChallengeTXClient } from "@ludex-labs/ludex-sdk-js/web3/solana/nft-challenge/client";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
 import { Offering } from "@ludex-labs/ludex-sdk-js/web3/solana/nft-challenge/client";
 import { guestIdentity, Metaplex } from "@metaplex-foundation/js";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import DescriptionIcon from "@mui/icons-material/Description";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import {
+  Connection,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  Transaction,
+} from "@solana/web3.js";
+
 // MUI
 import {
   Box,
@@ -26,12 +33,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import {
-  Connection,
-  LAMPORTS_PER_SOL,
-  PublicKey,
-  Transaction,
-} from "@solana/web3.js";
 
 interface DeserialziedOffering {
   name: string;
@@ -86,7 +87,7 @@ export const NFTJoin: FC<{
   const getPlayerStatus = async () => {
     if (!wallet) return;
     // Possible Statuses: "NOT_IN_GAME" | "ACCEPTED" | "JOINED"
-    var playerStatus = await NFTChallenge.NftChallengeTXClient.getPlayerStatus(
+    var playerStatus = await NftChallengeTXClient.getPlayerStatus(
       connection,
       wallet?.publicKey,
       challengeAddress
@@ -97,10 +98,7 @@ export const NFTJoin: FC<{
 
   const joinNFTChallenge = async () => {
     if (!wallet || !sendTransaction) return;
-    const ludexTx = new NFTChallenge.NftChallengeTXClient(
-      connection,
-      challengeAddress
-    );
+    const ludexTx = new NftChallengeTXClient(connection, challengeAddress);
     const tx = await ludexTx.join(wallet.publicKey.toBase58()).getTx();
     const result = connection.getLatestBlockhash();
     tx.recentBlockhash = (await result)?.blockhash;
@@ -115,7 +113,7 @@ export const NFTJoin: FC<{
   const getOfferings = async () => {
     try {
       if (!wallet) return;
-      var _offerings = await NFTChallenge.NftChallengeTXClient.getOfferings(
+      var _offerings = await NftChallengeTXClient.getOfferings(
         connection,
         challengeAddress
       );
@@ -165,10 +163,7 @@ export const NFTJoin: FC<{
   }, [challengeAddress, wallet]);
 
   const addOffering = async (type: string) => {
-    const ludexTx = new NFTChallenge.NftChallengeTXClient(
-      connection,
-      challengeAddress
-    );
+    const ludexTx = new NftChallengeTXClient(connection, challengeAddress);
     var tx: Transaction | undefined;
     if (type === "SOL") {
       tx = await ludexTx.addSolOffering(publicKey, amount).getTx();
@@ -192,11 +187,7 @@ export const NFTJoin: FC<{
   };
 
   const removeOffering = async () => {
-    const ludexTx = new NFTChallenge.NftChallengeTXClient(
-      connection,
-      challengeAddress
-    );
-
+    const ludexTx = new NftChallengeTXClient(connection, challengeAddress);
     if (!selectedOffering?.publicKey) return;
     var tx = await ludexTx
       .removeOffering(publicKey, selectedOffering?.publicKey)
@@ -213,10 +204,7 @@ export const NFTJoin: FC<{
   };
 
   const acceptOffering = async () => {
-    const ludexTx = new NFTChallenge.NftChallengeTXClient(
-      connection,
-      challengeAddress
-    );
+    const ludexTx = new NftChallengeTXClient(connection, challengeAddress);
     var tx = await ludexTx.accept(publicKey).getTx();
     const result = await connection.getLatestBlockhash();
     tx.recentBlockhash = result.blockhash;

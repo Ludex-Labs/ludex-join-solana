@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { FC, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { Challenge } from "@ludex-labs/ludex-sdk-js";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
 import {
   getChallengeInfo,
   Challenge as _Challenge,
+  ChallengeTXClient,
 } from "@ludex-labs/ludex-sdk-js/web3/solana/challenge/client";
+import { NativeChallengeTXClient } from "@ludex-labs/ludex-sdk-js/web3/solana/challenge/nativeChallengeClient";
 import { Connection, Transaction } from "@solana/web3.js";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { SafeEventEmitterProvider } from "@web3auth/base";
@@ -44,6 +45,7 @@ export const Join: FC<{
   const [viewOfferings, setViewOfferings] = useState<boolean>(false);
   const [challenge, setChallenge] = useState<_Challenge | undefined>(undefined);
   const [isTrade, setIsTrade] = useState<boolean>(false);
+  const [isNative, setIsNative] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
@@ -52,10 +54,12 @@ export const Join: FC<{
       const isMainnetParam = params.get("isMainnet");
       const challengeAddress = params.get("c");
       const isTradeParam = params.get("isTrade");
+      const isNativeParam = params.get("isNative");
       if (challengeType !== undefined) setType(challengeType);
       if (isMainnetParam === "true") changeNetwork("mainnet");
       if (challengeAddress !== null) setChallengeAddress(challengeAddress);
       if (isTradeParam === "true") setIsTrade(true);
+      if (isNativeParam === "true") setIsNative(true);
     })();
   }, [publicKey]);
 
@@ -97,14 +101,12 @@ export const Join: FC<{
   const joinFTChallenge = async () => {
     if (!wallet) return;
     try {
-      const ludexTx = new Challenge.ChallengeTXClient(
-        connection,
-        challengeAddress,
-        {
-          wallet: wallet,
-          cluster: isMainnet ? "MAINNET" : "DEVNET",
-        }
-      );
+      const env = isMainnet ? "MAINNET" : "DEVNET";
+      const ludexTx = isNative
+        ? new NativeChallengeTXClient(connection, challengeAddress, {
+            cluster: env,
+          })
+        : new ChallengeTXClient(connection, challengeAddress, { cluster: env });
       const tx = await ludexTx.join(wallet.publicKey.toBase58()).getTx();
       const result = connection.getLatestBlockhash();
       tx.recentBlockhash = (await result).blockhash;
@@ -127,14 +129,12 @@ export const Join: FC<{
   const leaveFTChallenge = async () => {
     if (!wallet) return;
     try {
-      const ludexTx = new Challenge.ChallengeTXClient(
-        connection,
-        challengeAddress,
-        {
-          wallet: wallet,
-          cluster: isMainnet ? "MAINNET" : "DEVNET",
-        }
-      );
+      const env = isMainnet ? "MAINNET" : "DEVNET";
+      const ludexTx = isNative
+        ? new NativeChallengeTXClient(connection, challengeAddress, {
+            cluster: env,
+          })
+        : new ChallengeTXClient(connection, challengeAddress, { cluster: env });
       const tx = await ludexTx.leave(wallet.publicKey.toBase58()).getTx();
       const result = connection.getLatestBlockhash();
       tx.recentBlockhash = (await result).blockhash;
