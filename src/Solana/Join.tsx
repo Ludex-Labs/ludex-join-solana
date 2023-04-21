@@ -316,7 +316,7 @@ export const Join: FC<{
           fullWidth
           variant="contained"
           size="large"
-          disabled={isLoading || challengeAddress.length < 35 || joined}
+          disabled={isLoading || challengeAddress.length < 35}
           sx={
             challenge
               ? {
@@ -346,7 +346,7 @@ export const Join: FC<{
           }
           onClick={() => fetchChallengeDetails()}
         >
-          {isLoading ? <CircularProgress size={24} /> : "View Challenge"}
+          {isLoading ? <CircularProgress size={24} /> : "Get Challenge"}
         </Button>
       )}
 
