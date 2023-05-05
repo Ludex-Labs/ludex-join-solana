@@ -2,6 +2,7 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
+import { Redeem } from "./Solana/Redeem";
 import { Join } from "./Solana/Join";
 import { RPC } from "./Solana/RPC";
 import { WalletSolana } from "./Solana/WalletSolana";
@@ -29,6 +30,7 @@ function App() {
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
     null
   );
+  const [redeem, setRedeem] = useState<string>("");
 
   useEffect(() => {
     const initWeb3Auth = async () => {
@@ -85,6 +87,14 @@ function App() {
 
     if (!wallet && provider) getWallet();
   }, [provider, wallet]);
+
+  useEffect(() => {
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const _redeem = params.get("redeem")?.toUpperCase();
+      if (_redeem && _redeem?.length > 0) setRedeem(_redeem);
+    })();
+  }, []);
 
   const changeNetwork = async (network: string) => {
     const isMainnet = network === "mainnet";
@@ -156,6 +166,16 @@ function App() {
               connection={connection}
               changeNetwork={changeNetwork}
               logout={logout}
+            />
+          ) : provider && connection != null ? (
+            <Redeem
+              publicKey={wallet?.publicKey?.toString() || ""}
+              provider={provider}
+              wallet={wallet}
+              isMainnet={isMainnet}
+              connection={connection}
+              changeNetwork={changeNetwork}
+              redeem={redeem}
             />
           ) : provider && connection != null ? (
             <Join
