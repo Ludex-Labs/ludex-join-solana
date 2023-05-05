@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { FC, useState } from "react";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
-import { Connection, Transaction } from "@solana/web3.js";
+import { Transaction } from "@solana/web3.js";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { SafeEventEmitterProvider } from "@web3auth/base";
 import RedeemIcon from "@mui/icons-material/Redeem";
@@ -15,7 +15,7 @@ export const Redeem: FC<{
   provider: SafeEventEmitterProvider | null;
   wallet?: Wallet;
   isMainnet: boolean;
-  connection: Connection;
+  // connection: Connection;
   changeNetwork: (network: string) => void;
   redeem: string;
 }> = (props) => {
@@ -23,22 +23,24 @@ export const Redeem: FC<{
     // publicKey,
     provider,
     // wallet,
-    // isMainnet,
-    connection,
+    isMainnet,
+    // connection,
     // changeNetwork,
     redeem,
   } = props;
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [signature, setSignature] = useState<string>("");
 
-  //const sendTransaction = async (tx: Transaction) => {
   const sendTransaction = async (txString: string) => {
     if (!provider) return "";
     try {
       var tx = Transaction.from(Buffer.from(txString, "base64"));
       setIsLoading(true);
       const solanaWallet = new SolanaWallet(provider);
-      tx = await solanaWallet.signTransaction(tx);
-      const sig = await connection.sendRawTransaction(tx.serialize());
+      const sig = await solanaWallet.signAndSendTransaction(tx);
+      console.info("sig: ", sig);
+      setSignature(sig?.signature);
+      toast.success("Successful Redeemed ");
       return sig;
     } catch (error) {
       console.error(error);
@@ -54,27 +56,56 @@ export const Redeem: FC<{
         Execute Transaction to Redeem
       </Typography>
 
-      <Button
-        disabled={isLoading}
-        onClick={() => sendTransaction(redeem)}
-        variant={"contained"}
-        sx={{
-          p: 5,
-          width: "300px",
-          backgroundColor: "#3eb718",
-          fontFamily: "Rubik",
-          textTransform: "none",
-          boxShadow: "#3eb71870 0px 8px 16px 0px!important",
-          fontSize: "1.2rem",
-          "&:hover": {
-            boxShadow: "none !important",
-            backgroundColor: "#ff714f14",
-          },
-        }}
-      >
-        <RedeemIcon sx={{ mr: 2, fontSize: "30px" }} />
-        Redeem
-      </Button>
+      {signature?.length > 0 ? (
+        <Button
+          disabled={isLoading}
+          onClick={() =>
+            window.open(
+              `https://solscan.io/tx/` +
+                signature +
+                `?cluster=${isMainnet ? "mainnet" : "devnet"}`,
+              "_blank"
+            )
+          }
+          variant={"contained"}
+          sx={{
+            p: 5,
+            width: "300px",
+            fontFamily: "Rubik",
+            textTransform: "none",
+            boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+            fontSize: "1.2rem",
+            "&:hover": {
+              boxShadow: "none !important",
+            },
+          }}
+        >
+          <RedeemIcon sx={{ mr: 2, fontSize: "30px" }} />
+          View Transaction
+        </Button>
+      ) : (
+        <Button
+          disabled={isLoading}
+          onClick={() => sendTransaction(redeem)}
+          variant={"contained"}
+          sx={{
+            p: 5,
+            width: "300px",
+            backgroundColor: "#3eb718",
+            fontFamily: "Rubik",
+            textTransform: "none",
+            boxShadow: "#3eb71870 0px 8px 16px 0px!important",
+            fontSize: "1.2rem",
+            "&:hover": {
+              boxShadow: "none !important",
+              backgroundColor: "#ff714f14",
+            },
+          }}
+        >
+          <RedeemIcon sx={{ mr: 2, fontSize: "30px" }} />
+          Redeem
+        </Button>
+      )}
     </Box>
   );
 };

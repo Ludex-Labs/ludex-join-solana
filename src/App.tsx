@@ -91,8 +91,12 @@ function App() {
   useEffect(() => {
     (async () => {
       const params = new URLSearchParams(window.location.search);
-      const _redeem = params.get("redeem")?.toUpperCase();
-      if (_redeem && _redeem?.length > 0) setRedeem(_redeem);
+      const _redeem = params.get("redeem");
+      if (_redeem && _redeem?.length > 0) {
+        const decoded = decodeURIComponent(_redeem);
+        console.log("decoded", decoded);
+        setRedeem(decoded);
+      }
     })();
   }, []);
 
@@ -173,7 +177,7 @@ function App() {
               provider={provider}
               wallet={wallet}
               isMainnet={isMainnet}
-              connection={connection}
+              // connection={connection}
               changeNetwork={changeNetwork}
               redeem={redeem}
             />
