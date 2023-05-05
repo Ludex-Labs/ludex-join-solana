@@ -167,7 +167,7 @@ function App() {
               changeNetwork={changeNetwork}
               logout={logout}
             />
-          ) : provider && connection != null ? (
+          ) : redeem.length > 0 && provider && connection != null ? (
             <Redeem
               publicKey={wallet?.publicKey?.toString() || ""}
               provider={provider}

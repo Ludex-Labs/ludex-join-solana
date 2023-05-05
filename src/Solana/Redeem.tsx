@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { FC, useState } from "react";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
-import { Connection } from "@solana/web3.js";
+import { Connection, Transaction } from "@solana/web3.js";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { SafeEventEmitterProvider } from "@web3auth/base";
 import RedeemIcon from "@mui/icons-material/Redeem";
+import { toast } from "react-hot-toast";
 
 // MUI
 import { Box, Button, Typography } from "@mui/material";
@@ -30,19 +31,18 @@ export const Redeem: FC<{
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   //const sendTransaction = async (tx: Transaction) => {
-  const sendTransaction = async (tx: any) => {
+  const sendTransaction = async (txString: string) => {
     if (!provider) return "";
     try {
+      var tx = Transaction.from(Buffer.from(txString, "base64"));
       setIsLoading(true);
       const solanaWallet = new SolanaWallet(provider);
       tx = await solanaWallet.signTransaction(tx);
       const sig = await connection.sendRawTransaction(tx.serialize());
       return sig;
     } catch (error) {
-      let errorString = (error as any)?.logs
-        ? error + " --- LOGS --- " + ((error as any)?.logs).toString()
-        : error?.toString();
-      return errorString ? errorString : "";
+      console.error(error);
+      toast.error("Error sending transaction");
     } finally {
       setIsLoading(false);
     }
