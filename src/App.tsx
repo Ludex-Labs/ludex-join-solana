@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
 import { Redeem } from "./Solana/Redeem";
+import { CreateVaultAccount } from "./Solana/CreateVaultAccount";
 import { Join } from "./Solana/Join";
 import { RPC } from "./Solana/RPC";
 import { WalletSolana } from "./Solana/WalletSolana";
@@ -31,6 +32,7 @@ function App() {
     null
   );
   const [redeem, setRedeem] = useState<string>("");
+  const [vaultAddress, setVaultAddress] = useState<string>("");
 
   useEffect(() => {
     const initWeb3Auth = async () => {
@@ -97,6 +99,15 @@ function App() {
         console.log("decoded", decoded);
         setRedeem(decoded);
       }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const _vaultAddress = params.get("vaultAddress");
+      if (_vaultAddress && _vaultAddress?.length > 0)
+        setVaultAddress(_vaultAddress);
     })();
   }, []);
 
@@ -180,6 +191,15 @@ function App() {
               // connection={connection}
               changeNetwork={changeNetwork}
               redeem={redeem}
+            />
+          ) : vaultAddress.length > 0 && provider && connection != null ? (
+            <CreateVaultAccount
+              publicKey={wallet?.publicKey?.toString() || ""}
+              provider={provider}
+              wallet={wallet}
+              changeNetwork={changeNetwork}
+              vaultAddress={vaultAddress}
+              connection={connection}
             />
           ) : provider && connection != null ? (
             <Join
