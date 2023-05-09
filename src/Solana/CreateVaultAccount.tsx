@@ -7,8 +7,6 @@ import { SafeEventEmitterProvider } from "@web3auth/base";
 import AddIcon from "@mui/icons-material/Add";
 import { toast } from "react-hot-toast";
 import * as anchor from "@project-serum/anchor";
-
-// MUI
 import { Box, Button, Typography, TextField } from "@mui/material";
 
 export const CreateVaultAccount: FC<{
@@ -50,7 +48,6 @@ export const CreateVaultAccount: FC<{
   //   if (await tokenAccountIsInitialized(connection, token)) {
   //     return token;
   //   }
-
   //   tx.add(
   //     Token.createAssociatedTokenAccountInstruction(
   //       ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -61,7 +58,6 @@ export const CreateVaultAccount: FC<{
   //       payer, // Who every is paying for the transaction
   //     ),
   //   );
-
   //   //sendTransaction(tx);
   //   return token;
   // };
@@ -77,8 +73,8 @@ export const CreateVaultAccount: FC<{
       const splToken = await import("@solana/spl-token");
       let ata = await splToken.getAssociatedTokenAddress(
         _mintPubkey,
-        _publicKey,
-        false
+        _vaultPublicKey,
+        true
       );
       // eslint-disable-next-line prefer-destructuring
       const blockhash = (await connection.getLatestBlockhash()).blockhash;
