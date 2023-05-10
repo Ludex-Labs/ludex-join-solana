@@ -96,7 +96,6 @@ function App() {
       const _redeem = params.get("redeem");
       if (_redeem && _redeem?.length > 0) {
         const decoded = decodeURIComponent(_redeem);
-        console.log("decoded", decoded);
         setRedeem(decoded);
       }
     })();
@@ -188,7 +187,7 @@ function App() {
               provider={provider}
               wallet={wallet}
               isMainnet={isMainnet}
-              // connection={connection}
+              connection={connection}
               changeNetwork={changeNetwork}
               redeem={redeem}
             />
@@ -196,7 +195,6 @@ function App() {
             <CreateVaultAccount
               publicKey={wallet?.publicKey?.toString() || ""}
               provider={provider}
-              wallet={wallet}
               changeNetwork={changeNetwork}
               vaultAddress={vaultAddress}
               connection={connection}

@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { FC, useState } from "react";
-import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
+import { FC, useState, useEffect } from "react";
 import { PublicKey, Transaction } from "@solana/web3.js";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { SafeEventEmitterProvider } from "@web3auth/base";
@@ -12,55 +11,24 @@ import { Box, Button, Typography, TextField } from "@mui/material";
 export const CreateVaultAccount: FC<{
   publicKey: string;
   provider: SafeEventEmitterProvider | null;
-  wallet?: Wallet;
   changeNetwork: (network: string) => void;
   vaultAddress: string;
   connection: anchor.web3.Connection;
 }> = (props) => {
-  const {
-    publicKey,
-    provider,
-    // wallet,
-    connection,
-    // changeNetwork,
-    vaultAddress,
-  } = props;
+  const { publicKey, provider, connection, changeNetwork, vaultAddress } =
+    props;
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [mint, setMint] = useState<string>(
     "So11111111111111111111111111111111111111112"
   );
 
-  // const getOrCreateATA = async (
-  //   connection: anchor.web3.Connection,
-  //   tx: Transaction,
-  //   owner: anchor.web3.PublicKey,
-  //   mint: anchor.web3.PublicKey,
-  //   payer: anchor.web3.PublicKey,
-  //   offCurve = false,
-  // ) => {
-  //   const associatedTokenAddress = await Token.getAssociatedTokenAddress(
-  //     ASSOCIATED_TOKEN_PROGRAM_ID,
-  //     TOKEN_PROGRAM_ID,
-  //     mint,
-  //     owner,
-  //     offCurve,
-  //   );
-  //   if (await tokenAccountIsInitialized(connection, token)) {
-  //     return token;
-  //   }
-  //   tx.add(
-  //     Token.createAssociatedTokenAccountInstruction(
-  //       ASSOCIATED_TOKEN_PROGRAM_ID,
-  //       TOKEN_PROGRAM_ID,
-  //       mint,
-  //       associatedTokenAddress,
-  //       owner, // Vault Blockchain Address
-  //       payer, // Who every is paying for the transaction
-  //     ),
-  //   );
-  //   //sendTransaction(tx);
-  //   return token;
-  // };
+  useEffect(() => {
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const isMainnetParam = params.get("isMainnet");
+      if (isMainnetParam === "true") changeNetwork("mainnet");
+    })();
+  }, []);
 
   const createTokenAccount = async () => {
     if (!provider) return "";

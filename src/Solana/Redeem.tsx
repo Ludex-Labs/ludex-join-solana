@@ -1,11 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
 import { Transaction } from "@solana/web3.js";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { SafeEventEmitterProvider } from "@web3auth/base";
 import RedeemIcon from "@mui/icons-material/Redeem";
 import { toast } from "react-hot-toast";
+import * as anchor from "@project-serum/anchor";
 
 // MUI
 import { Box, Button, Typography } from "@mui/material";
@@ -15,21 +16,23 @@ export const Redeem: FC<{
   provider: SafeEventEmitterProvider | null;
   wallet?: Wallet;
   isMainnet: boolean;
-  // connection: Connection;
+  connection: anchor.web3.Connection;
   changeNetwork: (network: string) => void;
   redeem: string;
 }> = (props) => {
-  const {
-    // publicKey,
-    provider,
-    // wallet,
-    isMainnet,
-    // connection,
-    // changeNetwork,
-    redeem,
-  } = props;
+  const { provider, isMainnet, connection, changeNetwork, redeem } = props;
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [signature, setSignature] = useState<string>("");
+
+  console.log("connection", connection);
+
+  useEffect(() => {
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const isMainnetParam = params.get("isMainnet");
+      if (isMainnetParam === "true") changeNetwork("mainnet");
+    })();
+  }, []);
 
   const sendTransaction = async (txString: string) => {
     if (!provider) return "";
