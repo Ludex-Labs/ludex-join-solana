@@ -95,8 +95,6 @@ export const WalletSolana: FC<{
     setTokenAcccount(tokenAccounts);
   };
 
-  console.log("tokenAccounts", tokenAccounts);
-
   return (
     <>
       <Typography variant={"h5"} sx={{ mb: 3.5 }}>
