@@ -2,13 +2,15 @@ import "./App.css";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
-import { Redeem } from "./Solana/Redeem";
+import { Sign } from "./Solana/Sign";
 import { CreateVaultAccount } from "./Solana/CreateVaultAccount";
 import { Join } from "./Solana/Join";
 import { RPC } from "./Solana/RPC";
 import { WalletSolana } from "./Solana/WalletSolana";
+import { Footer } from "./Solana/Footer";
 import { Connection } from "@solana/web3.js";
 import { Wallet } from "@ludex-labs/ludex-sdk-js/web3/solana/utils";
+import { Box, Button } from "@mui/material";
 
 // @ts-ignore
 import StarfieldAnimation from "react-starfield-animation";
@@ -17,10 +19,6 @@ import StarfieldAnimation from "react-starfield-animation";
 import { Web3Auth } from "@web3auth/modal";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
-
-// MUI
-import WalletIcon from "@mui/icons-material/Wallet";
-import { Box, Button, Divider } from "@mui/material";
 
 function App() {
   const [viewWallet, setViewWallet] = useState<boolean>(false);
@@ -31,8 +29,23 @@ function App() {
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
     null
   );
-  const [redeem, setRedeem] = useState<string>("");
+  const [tx, setTx] = useState<string>("");
   const [vaultAddress, setVaultAddress] = useState<string>("");
+
+  useEffect(() => {
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const _tx = params.get("tx");
+      if (_tx && _tx?.length > 0) {
+        const decoded = decodeURIComponent(_tx);
+        setTx(decoded);
+      }
+
+      const _vaultAddress = params.get("vaultAddress");
+      if (_vaultAddress && _vaultAddress?.length > 0)
+        setVaultAddress(_vaultAddress);
+    })();
+  }, []);
 
   useEffect(() => {
     const initWeb3Auth = async () => {
@@ -89,26 +102,6 @@ function App() {
 
     if (!wallet && provider) getWallet();
   }, [provider, wallet]);
-
-  useEffect(() => {
-    (async () => {
-      const params = new URLSearchParams(window.location.search);
-      const _redeem = params.get("redeem");
-      if (_redeem && _redeem?.length > 0) {
-        const decoded = decodeURIComponent(_redeem);
-        setRedeem(decoded);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      const params = new URLSearchParams(window.location.search);
-      const _vaultAddress = params.get("vaultAddress");
-      if (_vaultAddress && _vaultAddress?.length > 0)
-        setVaultAddress(_vaultAddress);
-    })();
-  }, []);
 
   const changeNetwork = async (network: string) => {
     const isMainnet = network === "mainnet";
@@ -181,21 +174,22 @@ function App() {
               changeNetwork={changeNetwork}
               logout={logout}
             />
-          ) : redeem.length > 0 && provider && connection != null ? (
-            <Redeem
+          ) : tx.length > 0 && provider && connection != null ? (
+            <Sign
+              tx={tx}
               provider={provider}
-              wallet={wallet}
               connection={connection}
+              isMainnet={isMainnet}
               changeNetwork={changeNetwork}
-              redeem={redeem}
             />
           ) : vaultAddress.length > 0 && provider && connection != null ? (
             <CreateVaultAccount
+              vaultAddress={vaultAddress}
               publicKey={wallet?.publicKey?.toString() || ""}
               provider={provider}
-              changeNetwork={changeNetwork}
-              vaultAddress={vaultAddress}
               connection={connection}
+              isMainnet={isMainnet}
+              changeNetwork={changeNetwork}
             />
           ) : provider && connection != null ? (
             <Join
@@ -219,76 +213,7 @@ function App() {
           )}
 
           {provider && (
-            <>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  width: "100%",
-                }}
-              >
-                <Divider sx={{ mt: 2, mb: 0 }} variant="middle" />
-
-                <Button
-                  sx={{
-                    minWidth: "250px",
-                    backgroundColor: "#ff714f",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: "10px",
-                    borderRadius: "10px",
-                    marginTop: "1rem",
-                    maxWidth: "290px",
-                    height: "42.25px",
-                    boxShadow: "#ff714f3d 0px 8px 16px 0px !important",
-                    "&:hover": {
-                      boxShadow: "none !important",
-                    },
-                  }}
-                  onClick={() => setViewWallet(!viewWallet)}
-                >
-                  {!viewWallet && (
-                    <WalletIcon sx={{ width: "25px", height: "25px" }} />
-                  )}
-                  <>
-                    <Box
-                      sx={{
-                        fontFamily: "Rubik",
-                        ml: viewWallet ? 0 : "5px",
-                        fontSize: "15px",
-                        fontWeight: 500,
-                        textTransform: "none",
-                      }}
-                    >
-                      {viewWallet ? "Back" : "Wallet"}
-                    </Box>
-                  </>
-                </Button>
-              </Box>
-
-              <Box
-                sx={{
-                  mt: 2,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <Box
-                  sx={{
-                    mb: 1,
-                  }}
-                >
-                  POWERED BY
-                </Box>
-                <img
-                  alt="solana"
-                  src="./assets/solana-title.svg"
-                  className="chain-container-1"
-                />
-              </Box>
-            </>
+            <Footer setViewWallet={setViewWallet} viewWallet={viewWallet} />
           )}
         </span>
       </Box>

@@ -1,26 +1,31 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { FC, useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
 import { PublicKey, Transaction } from "@solana/web3.js";
+import * as anchor from "@project-serum/anchor";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { SafeEventEmitterProvider } from "@web3auth/base";
-import AddIcon from "@mui/icons-material/Add";
-import { toast } from "react-hot-toast";
-import * as anchor from "@project-serum/anchor";
 import { Box, Button, Typography, TextField } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 
 export const CreateVaultAccount: FC<{
+  vaultAddress: string;
   publicKey: string;
   provider: SafeEventEmitterProvider | null;
-  changeNetwork: (network: string) => void;
-  vaultAddress: string;
   connection: anchor.web3.Connection;
+  isMainnet: boolean;
+  changeNetwork: (network: string) => void;
 }> = (props) => {
-  const { publicKey, provider, connection, changeNetwork, vaultAddress } =
-    props;
+  const {
+    vaultAddress,
+    publicKey,
+    provider,
+    connection,
+    isMainnet,
+    changeNetwork,
+  } = props;
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [mint, setMint] = useState<string>(
-    "So11111111111111111111111111111111111111112"
-  );
+  const [mint, setMint] = useState<string>("");
 
   useEffect(() => {
     (async () => {
@@ -58,14 +63,18 @@ export const CreateVaultAccount: FC<{
       tx.recentBlockhash = blockhash;
       const solanaWallet = new SolanaWallet(provider);
       const signed_tx = await solanaWallet.signTransaction(tx);
-      const signature = await connection.sendRawTransaction(
-        signed_tx.serialize(),
-        {
-          skipPreflight: true,
-        }
-      );
-      console.info("signature", signature);
+      const sig = await connection.sendRawTransaction(signed_tx.serialize(), {
+        skipPreflight: true,
+      });
       toast.success("Token Account Created");
+      setTimeout(() => {
+        window.open(
+          `https://solscan.io/tx/` +
+            sig +
+            `?cluster=${isMainnet ? "mainnet" : "devnet"}`,
+          "_blank"
+        );
+      }, 1000);
       return;
     } catch (error) {
       console.error(error);
