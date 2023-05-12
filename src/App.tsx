@@ -183,10 +183,8 @@ function App() {
             />
           ) : redeem.length > 0 && provider && connection != null ? (
             <Redeem
-              publicKey={wallet?.publicKey?.toString() || ""}
               provider={provider}
               wallet={wallet}
-              isMainnet={isMainnet}
               connection={connection}
               changeNetwork={changeNetwork}
               redeem={redeem}

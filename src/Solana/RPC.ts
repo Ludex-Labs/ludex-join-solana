@@ -81,6 +81,21 @@ export class RPC {
       publicKey: new PublicKey((await this.getAccounts())[0]),
     };
   };
+
+  getPrivateKey = async (): Promise<string> => {
+    // const privateKey = await this.provider.request({
+    //   method: "private_key",
+    //   params: {},
+    // });
+
+    const privateKey = await this.provider.request({
+      method: "solanaPrivateKey",
+    });
+
+    console.log(privateKey);
+
+    return privateKey as string;
+  };
 }
 
 export const getTestSol = async (publicKey: string) => {
