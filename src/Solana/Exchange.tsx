@@ -682,9 +682,9 @@ export const Exchange: FC<{
                 label="Token Amount"
                 type="number"
                 value={tokenAmount}
-                onChange={(e) =>
-                  setTokenAmount(parseInt(e.currentTarget.value))
-                }
+                onChange={(e) => {
+                  setTokenAmount(parseFloat(e.currentTarget.value));
+                }}
               />
             )}
 
@@ -704,7 +704,7 @@ export const Exchange: FC<{
               fullWidth
               variant="contained"
               onClick={() => addOffering("NFT")}
-              disabled={isLoading || mint?.length !== 44}
+              disabled={isLoading}
               sx={{
                 mb: 2,
                 backgroundColor: "#349bc6",
